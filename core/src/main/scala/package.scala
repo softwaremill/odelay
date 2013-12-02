@@ -1,5 +1,5 @@
 /** Deffered defines a set of primatives for deferring
- *  the execution of some task.
+ *  the execution of some task
  * 
  *  This is differs from scala.concurrent.Futures in that
  *  the execution of a task it defined in terms of delay defined

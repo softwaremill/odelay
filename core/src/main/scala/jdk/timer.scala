@@ -1,7 +1,7 @@
 package deferred.jdk
 
 import deferred.{ Deferral, Timer }
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.{ Duration }
 import java.util.concurrent.{
   RejectedExecutionHandler, ScheduledExecutorService,
   ScheduledFuture, ScheduledThreadPoolExecutor, ThreadFactory }
@@ -29,10 +29,17 @@ class JdkTimer(
                 .getOrElse(new ScheduledThreadPoolExecutor(poolSize, threads)),
          interruptOnCancel)
 
-  def apply[T](duration: Duration, todo: => T): Deferral =
+  def apply[T](delay: Duration, todo: => T): Deferral =
     JdkDeferral(underlying.schedule(new Runnable {
       def run = todo
-    }, duration.length, duration.unit))
+    }, delay.length, delay.unit))
+
+  def apply[T](wait: Duration, period: Duration, todo: => T): Deferral =
+    JdkDeferral(underlying.scheduleWithFixedDelay(new Runnable {
+      def run = todo
+    }, wait.toUnit(period.unit).toLong, period.length, period.unit))
+
+  def stop() = if (!underlying.isShutdown) underlying.shutdownNow()
 }
 
 
@@ -48,6 +55,7 @@ object Default {
   }
   val rejectionHandler: Option[RejectedExecutionHandler] = None
   val interruptOnCancel = true
+  /** @return a _new_ Timer. when used clients should be sure to call stop() on all instances for a clean shutdown */
   def timer: Timer = new JdkTimer(
     poolSize, threadFactory, rejectionHandler, interruptOnCancel)
 }
