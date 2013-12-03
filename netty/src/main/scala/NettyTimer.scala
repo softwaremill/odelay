@@ -7,6 +7,7 @@ import scala.concurrent.duration._
 
 class NettyTimer(underlying: NTimer = new HashedWheelTimer)
   extends Timer {
+
   def apply[T](delay: Duration, op: => T): Timeout =
     new Timeout {
       val to = underlying.newTimeout(new TimerTask {

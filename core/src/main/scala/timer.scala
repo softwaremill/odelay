@@ -23,16 +23,6 @@ trait Timer {
   def stop(): Unit
 }
 
-object Delay {  
-  def apply[T](after: Duration)(
-    todo: => T)(implicit timer: Timer): Timeout =
-    timer(after, todo)
-
-  def repeatedly[T](after: Duration)(period: Duration)(
-    todo: => T)(implicit timer: Timer): Timeout =
-    timer(after, period, todo)
-}
-
 /** Defines default configurations for timers */
 object Default {
   implicit val timer: Timer = jdk.Default.timer
