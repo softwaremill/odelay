@@ -18,15 +18,18 @@ trait Timer {
   /** Deferrs the execution of a task until the provided duration */
   def apply[T](after: Duration, todo: => T): Deferral
   /** Deferrs the execution of a task until the provided wait duration then repeats task at the every duration after */
-  def apply[T](wait: Duration, every: Duration, todo: => T): Deferral
+  def apply[T](after: Duration, every: Duration, todo: => T): Deferral
   /** Stops the timer and releases any retained resources */
   def stop(): Unit
 }
 
 object Timer {  
-  def apply[T](duration: Duration)(
+  def apply[T](after: Duration)(
     todo: => T)(implicit timer: Timer): Deferral =
-    timer(duration, todo)
+    timer(after, todo)
+  def repeatedly[T](after: Duration)(period: Duration)(
+    todo: => T)(implicit timer: Timer): Deferral =
+    timer(after, period, todo)
 }
 
 /** Defines default configurations for timers */

@@ -6,14 +6,6 @@ import java.util.concurrent.{
   RejectedExecutionHandler, ScheduledExecutorService,
   ScheduledFuture, ScheduledThreadPoolExecutor, ThreadFactory }
 
-/** A Deferral for jdk ScheduledFutures */
-case class JdkDeferral[T](
-  underlying: ScheduledFuture[T],
-  interrupts: Boolean = false)
-  extends Deferral {
-  def cancel() = if (!underlying.isCancelled) underlying.cancel(interrupts)
-}
-
 /** A Timer implemented in terms of a jdk ScheduledThreadPoolExecutor */
 class JdkTimer(
   underlying: ScheduledExecutorService,
@@ -29,15 +21,21 @@ class JdkTimer(
                 .getOrElse(new ScheduledThreadPoolExecutor(poolSize, threads)),
          interruptOnCancel)
 
-  def apply[T](delay: Duration, todo: => T): Deferral =
-    JdkDeferral(underlying.schedule(new Runnable {
-      def run = todo
-    }, delay.length, delay.unit))
+  def apply[T](after: Duration, todo: => T): Deferral =
+    new Deferral {
+      val future = underlying.schedule(new Runnable {
+        def run = todo
+      }, after.length, after.unit)
+      def cancel() = if (!future.isCancelled) future.cancel(interruptOnCancel)
+    }
 
-  def apply[T](wait: Duration, period: Duration, todo: => T): Deferral =
-    JdkDeferral(underlying.scheduleWithFixedDelay(new Runnable {
-      def run = todo
-    }, wait.toUnit(period.unit).toLong, period.length, period.unit))
+  def apply[T](after: Duration, period: Duration, todo: => T): Deferral =
+    new Deferral {
+      val future = underlying.scheduleWithFixedDelay(new Runnable {
+        def run = todo
+      }, after.toUnit(period.unit).toLong, period.length, period.unit)
+      def cancel() = if (!future.isCancelled) future.cancel(interruptOnCancel)
+    }
 
   def stop() = if (!underlying.isShutdown) underlying.shutdownNow()
 }
