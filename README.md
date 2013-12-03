@@ -1,5 +1,5 @@
-# deferred
+# odelay
 
-A small set of primatives for task executions deferred by `scala.concurrent.duration.Durations`
+A small set of primatives supporting delayed reactions
 
 Doug Tangren (softprops) 2013
