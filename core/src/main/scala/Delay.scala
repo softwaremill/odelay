@@ -1,5 +1,7 @@
 package odelay
 
+import scala.concurrent.duration.Duration
+
 object Delay {  
   def apply[T](delay: Duration)(
     todo: => T)(implicit timer: Timer): Timeout =
