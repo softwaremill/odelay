@@ -13,7 +13,7 @@ trait Timeout {
 
 /** The deferrer of some operation */
 @implicitNotFound(
-  "Cannot find an implicit deferred.Timer, either define one yourself or import deferred.Defaults._")
+  "Cannot find an implicit odelay.Timer, either define one yourself or import odelay.Default._")
 trait Timer {
   /** Delays the execution of an operation until the provided duration */
   def apply[T](delay: Duration, op: => T): Timeout
