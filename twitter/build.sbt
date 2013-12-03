@@ -1,7 +1,3 @@
-organization := "me.lessis"
-
-name := "odelay-twitter"
-
 libraryDependencies += "com.twitter" % "util-core"  % "6.3.4"
 
 description := "provides a deferred.Timer implementation backed by a com.twitter.util.Timer"
