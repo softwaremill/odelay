@@ -16,7 +16,7 @@ object Build extends sbt.Build {
       .settings(publish := { })
       .aggregate(core, netty3, netty, twttr)
   lazy val core = module("core")
-  lazy val netty3 = module("netty3")
-  lazy val netty = module("netty")
-  lazy val twttr = module("twitter")
+  lazy val netty3 = module("netty3").dependsOn(core)
+  lazy val netty = module("netty").dependsOn(core)
+  lazy val twttr = module("twitter").dependsOn(core)
 }
