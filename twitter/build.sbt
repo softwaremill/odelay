@@ -1,6 +1,6 @@
 organization := "me.lessis"
 
-name := "deferred-twitter"
+name := "odelay-twitter"
 
 libraryDependencies += "com.twitter" % "util-core"  % "6.3.4"
 

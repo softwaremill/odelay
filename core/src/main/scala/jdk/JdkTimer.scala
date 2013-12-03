@@ -1,9 +1,9 @@
-package deferred.jdk
+package odelay.jdk
 
-import deferred.{ Deferral, Timer }
+import odelay.{ Timeout, Timer }
 import scala.concurrent.duration.{ Duration }
 import java.util.concurrent.{
-  RejectedExecutionHandler, ScheduledExecutorService,
+  Future, RejectedExecutionHandler, ScheduledExecutorService,
   ScheduledFuture, ScheduledThreadPoolExecutor, ThreadFactory }
 
 /** A Timer implemented in terms of a jdk ScheduledThreadPoolExecutor */
@@ -21,16 +21,16 @@ class JdkTimer(
                 .getOrElse(new ScheduledThreadPoolExecutor(poolSize, threads)),
          interruptOnCancel)
 
-  def apply[T](after: Duration, todo: => T): Deferral =
-    new Deferral {
+  def apply[T](after: Duration, todo: => T): Timeout =
+    new Timeout {
       val future = underlying.schedule(new Runnable {
         def run = todo
       }, after.length, after.unit)
       def cancel() = if (!future.isCancelled) future.cancel(interruptOnCancel)
     }
 
-  def apply[T](after: Duration, period: Duration, todo: => T): Deferral =
-    new Deferral {
+  def apply[T](after: Duration, period: Duration, todo: => T): Timeout =
+    new Timeout {
       val future = underlying.scheduleWithFixedDelay(new Runnable {
         def run = todo
       }, after.toUnit(period.unit).toLong, period.length, period.unit)

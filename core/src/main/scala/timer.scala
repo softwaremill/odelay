@@ -1,11 +1,11 @@
-package deferred
+package odelay
 
 import scala.concurrent.duration.Duration
 import scala.annotation.implicitNotFound
 
 /** The result of a deferred execution */
-trait Deferral {
-  /** Cancels the execution of the deferred operation. Once a Deferral
+trait Timeout {
+  /** Cancels the execution of the deferred operation. Once a Timeout
    *  is canceled, if additional attempts to cancel will result in undefined
    *  behavior */
   def cancel(): Unit
@@ -15,20 +15,21 @@ trait Deferral {
 @implicitNotFound(
   "Cannot find an implicit deferred.Timer, either define one yourself or import deferred.Defaults._")
 trait Timer {
-  /** Deferrs the execution of a task until the provided duration */
-  def apply[T](after: Duration, todo: => T): Deferral
-  /** Deferrs the execution of a task until the provided wait duration then repeats task at the every duration after */
-  def apply[T](after: Duration, every: Duration, todo: => T): Deferral
+  /** Delays the execution of an operation until the provided duration */
+  def apply[T](delay: Duration, op: => T): Timeout
+  /** Delays the execution of an operation until the provided deplay and then after, repeats the operation at the every duration after */
+  def apply[T](delay: Duration, every: Duration, todo: => T): Timeout
   /** Stops the timer and releases any retained resources */
   def stop(): Unit
 }
 
-object Timer {  
+object Delay {  
   def apply[T](after: Duration)(
-    todo: => T)(implicit timer: Timer): Deferral =
+    todo: => T)(implicit timer: Timer): Timeout =
     timer(after, todo)
+
   def repeatedly[T](after: Duration)(period: Duration)(
-    todo: => T)(implicit timer: Timer): Deferral =
+    todo: => T)(implicit timer: Timer): Timeout =
     timer(after, period, todo)
 }
 
