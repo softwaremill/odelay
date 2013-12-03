@@ -21,19 +21,19 @@ class JdkTimer(
                 .getOrElse(new ScheduledThreadPoolExecutor(poolSize, threads)),
          interruptOnCancel)
 
-  def apply[T](after: Duration, todo: => T): Timeout =
+  def apply[T](delay: Duration, op: => T): Timeout =
     new Timeout {
       val future = underlying.schedule(new Runnable {
-        def run = todo
-      }, after.length, after.unit)
+        def run = op
+      }, delay.length, delay.unit)
       def cancel() = if (!future.isCancelled) future.cancel(interruptOnCancel)
     }
 
-  def apply[T](after: Duration, period: Duration, todo: => T): Timeout =
+  def apply[T](delay: Duration, every: Duration, op: => T): Timeout =
     new Timeout {
       val future = underlying.scheduleWithFixedDelay(new Runnable {
-        def run = todo
-      }, after.toUnit(period.unit).toLong, period.length, period.unit)
+        def run = op
+      }, delay.toUnit(every.unit).toLong, every.length, every.unit)
       def cancel() = if (!future.isCancelled) future.cancel(interruptOnCancel)
     }
 
