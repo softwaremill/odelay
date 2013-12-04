@@ -3,31 +3,50 @@ package odelay.netty
 import odelay.{ Timeout, Timer }
 import org.jboss.netty.util.{
   HashedWheelTimer, Timeout => NTimeout, Timer => NTimer, TimerTask }
-import scala.concurrent.duration._
+import scala.concurrent.Promise
+import scala.concurrent.duration.Duration
+import java.util.concurrent.ThreadFactory
 
 class NettyTimer(underlying: NTimer = new HashedWheelTimer)
   extends Timer {
-  def apply[T](after: Duration, op: => T): Timeout =
-    new Timeout {
+  def apply[T](after: Duration, op: => T): Timeout[T] =
+    new Timeout[T] {
+      val p = Promise[T]()
       private val to = underlying.newTimeout(new TimerTask {
-          def run(timeout: NTimeout) = op
+          def run(timeout: NTimeout) = p.success(op)
         }, after.length, after.unit)
-      def cancel() = if (!to.isCancelled) to.cancel
+      def future = p.future
+      def cancel() = if (!to.isCancelled) {
+        to.cancel
+        Timeout.cancel(p)
+      }
     }
 
-  def apply[T](delay: Duration, every: Duration, op: => T): Timeout =
-    new Timeout {
-      @volatile var nextTimeout: Option[Timeout] = None
+  def apply[T](delay: Duration, every: Duration, op: => T): Timeout[T] =
+    new Timeout[T] {
+      val p = Promise[T]()
+      @volatile var nextTimeout: Option[Timeout[T]] = None
       val to = underlying.newTimeout(new TimerTask {
         def run(timeout: NTimeout) = try op finally {
           nextTimeout = Some(apply(every, every, op))
         }
       }, delay.length, delay.unit)
+      def future = p.future
       def cancel() = if (!to.isCancelled) {
         to.cancel
         nextTimeout.foreach(_.cancel())
+        Timeout.cancel(p)
       }
     }
 
   def stop(): Unit = underlying.stop()
+}
+
+object Default {
+  def timer: Timer = new NettyTimer(new HashedWheelTimer(new ThreadFactory {
+    def newThread(runs: Runnable) =
+      new Thread(runs) {
+        setDaemon(true)
+      }
+  }))
 }

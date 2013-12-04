@@ -1,10 +1,11 @@
 package odelay.jdk
 
 import odelay.{ Timeout, Timer }
-import scala.concurrent.duration.{ Duration }
+import scala.concurrent.Promise
+import scala.concurrent.duration.Duration
 import java.util.concurrent.{
-  Future, RejectedExecutionHandler, ScheduledExecutorService,
-  ScheduledFuture, ScheduledThreadPoolExecutor, ThreadFactory }
+  RejectedExecutionHandler, ScheduledExecutorService,
+  ScheduledThreadPoolExecutor, ThreadFactory }
 
 /** A Timer implemented in terms of a jdk ScheduledThreadPoolExecutor */
 class JdkTimer(
@@ -21,20 +22,32 @@ class JdkTimer(
                 .getOrElse(new ScheduledThreadPoolExecutor(poolSize, threads)),
          interruptOnCancel)
 
-  def apply[T](delay: Duration, op: => T): Timeout =
-    new Timeout {
-      val future = underlying.schedule(new Runnable {
-        def run = op
+  def apply[T](delay: Duration, op: => T): Timeout[T] =
+    new Timeout[T] {
+      val p = Promise[T]()
+      val jfuture = underlying.schedule(new Runnable {
+        def run() {
+          p.success(op)
+        }
       }, delay.length, delay.unit)
-      def cancel() = if (!future.isCancelled) future.cancel(interruptOnCancel)
+      def future = p.future
+      def cancel() = if (!jfuture.isCancelled) {
+        jfuture.cancel(interruptOnCancel)
+        Timeout.cancel(p)
+      }
     }
 
-  def apply[T](delay: Duration, every: Duration, op: => T): Timeout =
-    new Timeout {
-      val future = underlying.scheduleWithFixedDelay(new Runnable {
+  def apply[T](delay: Duration, every: Duration, op: => T): Timeout[T] =
+    new Timeout[T] {
+      val p = Promise[T]()
+      val jfuture = underlying.scheduleWithFixedDelay(new Runnable {
         def run = op
       }, delay.toUnit(every.unit).toLong, every.length, every.unit)
-      def cancel() = if (!future.isCancelled) future.cancel(interruptOnCancel)
+      def future = p.future
+      def cancel() = if (!jfuture.isCancelled) {
+        jfuture.cancel(interruptOnCancel)
+        Timeout.cancel(p)
+      }
     }
 
   def stop() = if (!underlying.isShutdown) underlying.shutdownNow()
@@ -45,11 +58,10 @@ class JdkTimer(
 object Default {
   lazy val poolSize = Runtime.getRuntime().availableProcessors()
   lazy val threadFactory: ThreadFactory = new ThreadFactory {
-    def newThread(runnable: Runnable) = {
-      new Thread(runnable) {
+    def newThread(runs: Runnable) =
+      new Thread(runs) {
         setDaemon(true)
       }
-    }
   }
   val rejectionHandler: Option[RejectedExecutionHandler] = None
   val interruptOnCancel = true

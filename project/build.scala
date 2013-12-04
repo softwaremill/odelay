@@ -10,13 +10,25 @@ object Build extends sbt.Build {
             settings = Defaults.defaultSettings ++ Seq(
               organization := Common.organization,
               name := s"odelay-$mod",
-              version := Common.version))
+              version := Common.version,
+              crossScalaVersions := Seq("2.9.3", "2.10.3"),
+              scalacOptions ++= Seq(Opts.compile.deprecation)))
   lazy val root =
     Project("root", file("."))
-      .settings(publish := { })
-      .aggregate(core, netty3, netty, twttr)
-  lazy val core = module("core")
-  lazy val netty3 = module("netty3").dependsOn(core)
-  lazy val netty = module("netty").dependsOn(core)
-  lazy val twttr = module("twitter").dependsOn(core)
+      .settings(publish := {}, test := {})
+      .aggregate(core, coreTests, netty3, netty, twttr, testing)
+  lazy val core: Project = module("core")
+    .settings(test := {}) // see coreTests module
+  lazy val testing = module("testing")
+    .settings(publish := {})
+    .dependsOn(core)
+  lazy val coreTests = module("core-tests")
+    .settings(publish := {})
+    .dependsOn(testing % "test->test;compile->compile")
+  lazy val netty3 = module("netty3")
+    .dependsOn(core, testing % "test->test")
+  lazy val netty = module("netty")
+    .dependsOn(core, testing % "test->test")
+  lazy val twttr = module("twitter")
+    .dependsOn(core, testing % "test->test")
 }
