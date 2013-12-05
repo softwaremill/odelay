@@ -12,10 +12,13 @@ object Build extends sbt.Build {
               name := s"odelay-$mod",
               version := Common.version,
               crossScalaVersions := Seq("2.9.3", "2.10.3"),
-              scalacOptions ++= Seq(Opts.compile.deprecation)))
+              scalacOptions ++= Seq(Opts.compile.deprecation),
+              licenses := Seq(("MIT",  url("https://github.com/softprops/odelay/blob/%s/LICENSE"
+                                           .format(version.value))))) ++
+            bintray.Plugin.bintraySettings)
   lazy val root =
     Project("root", file("."))
-      .settings(publish := {}, test := {})
+      .settings(crossScalaVersions := Seq("2.9.3", "2.10.3"), publish := {}, test := {})
       .aggregate(core, coreTests, netty3, netty, twttr, testing)
   lazy val core: Project = module("core")
     .settings(test := {}) // see coreTests module
