@@ -4,12 +4,12 @@ import odelay.{ Timeout, Timer }
 import org.jboss.netty.util.{
   HashedWheelTimer, Timeout => NTimeout, Timer => NTimer, TimerTask }
 import scala.concurrent.Promise
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.FiniteDuration
 import java.util.concurrent.ThreadFactory
 
 class NettyTimer(underlying: NTimer = new HashedWheelTimer)
   extends Timer {
-  def apply[T](after: Duration, op: => T): Timeout[T] =
+  def apply[T](after: FiniteDuration, op: => T): Timeout[T] =
     new Timeout[T] {
       val p = Promise[T]()
       private val to = underlying.newTimeout(new TimerTask {
@@ -22,7 +22,7 @@ class NettyTimer(underlying: NTimer = new HashedWheelTimer)
       }
     }
 
-  def apply[T](delay: Duration, every: Duration, op: => T): Timeout[T] =
+  def apply[T](delay: FiniteDuration, every: FiniteDuration, op: => T): Timeout[T] =
     new Timeout[T] {
       val p = Promise[T]()
       @volatile var nextTimeout: Option[Timeout[T]] = None

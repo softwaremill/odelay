@@ -46,7 +46,7 @@ trait TimerSpec extends FunSpec with BeforeAndAfterAll {
 
     it ("should repeatedly execute an operation on a fixed delay") {
       val start = System.currentTimeMillis
-      val timeout = Delay.repeatedly(0.millis)(150.millis) {
+      val timeout = Delay.repeatedly(150.millis)() {
         val diff = System.currentTimeMillis - start
         println(s"delay repeatedly diff $diff")
         diff

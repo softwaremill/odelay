@@ -3,11 +3,11 @@ package odelay.twitter
 import odelay.{ Timeout, Timer }
 import com.twitter.util.{ Duration, Timer => TwttrTimer, TimerTask }
 import scala.concurrent.Promise
-import scala.concurrent.duration.{ Duration => StdDuration }
+import scala.concurrent.duration.FiniteDuration
 
 case class TwitterTimer(underlying: TwttrTimer) extends Timer {
 
-  def apply[T](delay: StdDuration, op: => T): Timeout[T] =
+  def apply[T](delay: FiniteDuration, op: => T): Timeout[T] =
     new Timeout[T] {
       val p = Promise[T]()
       val tto = underlying.schedule(
@@ -19,7 +19,7 @@ case class TwitterTimer(underlying: TwttrTimer) extends Timer {
       }
     }
 
-  def apply[T](delay: StdDuration, every: StdDuration, op: => T): Timeout[T] =
+  def apply[T](delay: FiniteDuration, every: FiniteDuration, op: => T): Timeout[T] =
     new Timeout[T] {
       val p = Promise[T]()
       val tto = underlying.schedule(

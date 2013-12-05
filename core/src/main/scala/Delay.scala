@@ -1,13 +1,13 @@
 package odelay
 
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.{ Duration, FiniteDuration }
 
 object Delay {  
-  def apply[T](delay: Duration)(
+  def apply[T](delay: FiniteDuration)(
     todo: => T)(implicit timer: Timer): Timeout[T] =
     timer(delay, todo)
 
-  def repeatedly[T](delay: Duration)(every: Duration)(
+  def repeatedly[T](every: FiniteDuration)(delay: FiniteDuration = Duration.Zero)(
     todo: => T)(implicit timer: Timer): Timeout[T] =
     timer(delay, every, todo)
 }

@@ -2,7 +2,7 @@ package odelay.jdk
 
 import odelay.{ Timeout, Timer }
 import scala.concurrent.Promise
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.{ Duration, FiniteDuration }
 import java.util.concurrent.{
   RejectedExecutionHandler, ScheduledExecutorService,
   ScheduledThreadPoolExecutor, ThreadFactory }
@@ -22,7 +22,7 @@ class JdkTimer(
                 .getOrElse(new ScheduledThreadPoolExecutor(poolSize, threads)),
          interruptOnCancel)
 
-  def apply[T](delay: Duration, op: => T): Timeout[T] =
+  def apply[T](delay: FiniteDuration, op: => T): Timeout[T] =
     new Timeout[T] {
       val p = Promise[T]()
       val jfuture = underlying.schedule(new Runnable {
@@ -37,7 +37,7 @@ class JdkTimer(
       }
     }
 
-  def apply[T](delay: Duration, every: Duration, op: => T): Timeout[T] =
+  def apply[T](delay: FiniteDuration, every: FiniteDuration, op: => T): Timeout[T] =
     new Timeout[T] {
       val p = Promise[T]()
       val jfuture = underlying.scheduleWithFixedDelay(new Runnable {

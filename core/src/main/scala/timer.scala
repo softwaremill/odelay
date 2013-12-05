@@ -1,11 +1,11 @@
 package odelay
 
 import scala.concurrent.{ Future, Promise }
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.FiniteDuration
 import scala.annotation.implicitNotFound
 import java.util.concurrent.CancellationException
 
-object Timeout {
+private [odelay] object Timeout {
   private [odelay] def cancel[T](p: Promise[T]) = p.failure(new CancellationException)
 }
 
@@ -26,10 +26,10 @@ trait Timeout[T] {
   "Cannot find an implicit odelay.Timer, either define one yourself or import odelay.Default._")
 trait Timer {
   /** Delays the execution of an operation until the provided duration */
-  def apply[T](delay: Duration, op: => T): Timeout[T]
+  def apply[T](delay: FiniteDuration, op: => T): Timeout[T]
   /** Delays the execution of an operation until the provided deplay and then after, repeats the operation at the every duration after.
    *  Timeouts returned by this expose a Future that will never complete until cancelled */
-  def apply[T](delay: Duration, every: Duration, todo: => T): Timeout[T]
+  def apply[T](delay: FiniteDuration, every: FiniteDuration, todo: => T): Timeout[T]
   /** Stops the timer and releases any retained resources */
   def stop(): Unit
 }
