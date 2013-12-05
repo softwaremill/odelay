@@ -18,7 +18,7 @@ class NettyTimer(underlying: NTimer = new HashedWheelTimer)
       }, delay.length, delay.unit)
       def future = p.future
       def cancel() = if (!to.isCancelled) {
-        to.cancel
+        to.cancel()
         Timeout.cancel(p)
       }
     }
@@ -34,7 +34,7 @@ class NettyTimer(underlying: NTimer = new HashedWheelTimer)
       }, delay.length, delay.unit)
       def future = p.future
       def cancel() = if (!to.isCancelled) {
-        to.cancel
+        to.cancel()
         nextTimeout.foreach(_.cancel())
         Timeout.cancel(p)
       }

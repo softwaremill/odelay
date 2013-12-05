@@ -7,6 +7,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.util.control.NonFatal
 import java.util.concurrent.CancellationException
+import java.util.concurrent.atomic.AtomicInteger
 
 trait TimerSpec extends FunSpec with BeforeAndAfterAll {
   
@@ -18,9 +19,7 @@ trait TimerSpec extends FunSpec with BeforeAndAfterAll {
     it ("should execute an operation after an initial delay") {
       val start = System.currentTimeMillis
       val fut = Delay(1.seconds) {
-        val diff = System.currentTimeMillis - start
-        println(s"delay once diff $diff")
-        diff
+        System.currentTimeMillis - start
       }.future
       val value = Await.result(fut, 2.seconds)
       value.millis.toSeconds === 1.seconds
@@ -33,7 +32,7 @@ trait TimerSpec extends FunSpec with BeforeAndAfterAll {
       }.future, 200.millis)
     }
 
-    it ("canellation of deplayed operations should result in future failure") {
+    it ("cancellation of delayed operations should result in future failure") {
       val cancel = Delay(1.second)(sys.error("this should never print"))
       Delay(150.millis) {
         cancel.cancel()
@@ -43,17 +42,44 @@ trait TimerSpec extends FunSpec with BeforeAndAfterAll {
       }
     }
 
+    it ("completion of delayed operations should result in a future success") {
+      val future = Delay(1.second)(true).future
+      future.onFailure {
+        case NonFatal(_) => sys.error("this should never print")
+      }
+      future.onSuccess {
+        case value => assert(value === true)
+      }
+    }
+
 
     it ("should repeatedly execute an operation on a fixed delay") {
       val start = System.currentTimeMillis
       val timeout = Delay.repeatedly(150.millis)() {
         val diff = System.currentTimeMillis - start
-        println(s"delay repeatedly diff $diff")
+        print('.')
         diff
       }
-      Await.result(Delay(2.seconds) {
+      timeout.future.onFailure { case NonFatal(_) => println() }
+      Await.ready(Delay(2.seconds) {
         timeout.cancel()
       }.future, 3.seconds)
+    }
+
+    it ("cancellation of repeatedly delayed operations should result in future failure") {
+      val cancel = Delay.repeatedly(150.second)()(true)
+      val counter = new AtomicInteger(0)
+      cancel.future.onFailure {
+        case NonFatal(e) =>
+          assert(e.getClass === classOf[CancellationException])
+          counter.incrementAndGet()
+      }
+      Await.ready(Delay(2.second) {
+        cancel.cancel()
+      }.future, 3.seconds)
+      Await.ready(cancel.future, 3.seconds)
+      Thread.sleep(100)
+      assert(counter.get() === 1)
     }
   }
 
