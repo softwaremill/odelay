@@ -20,7 +20,7 @@ object Build extends sbt.Build {
   lazy val core: Project = module("core")
     .settings(test := {}) // see coreTests module
   lazy val testing = module("testing")
-    .settings(publish := {})
+    .settings(publish := {}, test := {})
     .dependsOn(core)
   lazy val coreTests = module("core-tests")
     .settings(publish := {})
