@@ -6,7 +6,7 @@ import scala.annotation.implicitNotFound
 import java.util.concurrent.CancellationException
 
 private [odelay] object Timeout {
-  private [odelay] def cancel[T](p: Promise[T]) = p.failure(new CancellationException)
+  private [odelay] def cancel[T](p: Promise[T]) = if (!p.isCompleted) p.failure(new CancellationException)
 }
 
 /** The result of a deferred execution */
