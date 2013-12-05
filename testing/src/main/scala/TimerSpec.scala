@@ -67,14 +67,14 @@ trait TimerSpec extends FunSpec with BeforeAndAfterAll {
     }
 
     it ("cancellation of repeatedly delayed operations should result in future failure") {
-      val cancel = Delay.repeatedly(150.second)()(true)
+      val cancel = Delay.repeatedly(150.seconds)()(true)
       val counter = new AtomicInteger(0)
       cancel.future.onFailure {
         case NonFatal(e) =>
           assert(e.getClass === classOf[CancellationException])
           counter.incrementAndGet()
       }
-      Await.ready(Delay(2.second) {
+      Await.ready(Delay(2.seconds) {
         cancel.cancel()
       }.future, 3.seconds)
       Await.ready(cancel.future, 3.seconds)
