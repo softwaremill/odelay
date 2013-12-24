@@ -1,1 +1,1 @@
-libraryDependencies += "org.jboss.netty" % "netty" % "3.2.9.Final"
+libraryDependencies += "org.jboss.netty" % "netty" % "3.9.0.Final"
