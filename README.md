@@ -1,6 +1,6 @@
 # odelay
 
-A small set of primatives supporting delayed reactions
+A small set of primatives supporting delayed reactions.
 
 ## usage
 
@@ -86,7 +86,17 @@ odelay.Delay(2.seconds) {
 #### TwitterTimers
 
 If your application is build around the [twitter util][tu] suite of utilities, there's a good chance you will want to use the `odelay-twitter` module which 
-defines an `odelay.Timer` in terms of twitter util's own timer interface, `com.twitter.util.Timer`. Since twitter's timers are abstractions over various implementations, you will probably have a predefined instance of one which you can adapt to with an `odelay.twitter.Timer`
+defines an `odelay.Timer` in terms of twitter util's own timer interface, `com.twitter.util.Timer`. A default Timer is provided backed by a `com.twitter.util.JavaTimer`
+
+```scala
+import scala.concurrent.duration._
+implicit val timer = odelay.twitter.Default.timer
+odelay.Delay(2.seconds) {
+  println("executed")
+}
+```
+
+You may also define your own `odelay.Timer` in terms of a `com.twitter.util.Timer` which you may already have in scope.
 
 ```scala
 import scala.concurrent.duration._
@@ -98,14 +108,17 @@ odelay.Delay(2.seconds) {
 
 ### releasing resources
 
-`odelay.Timers` use thread resources to do work. In order for a jvm to be shutdown cleanly, these resources need to be released. A typical application should only use _one_ instance of an `odelay.Timer`. When an application terminates it should ensure that the `stop()` method of that `odelay.Timer` is invoked.
-
+`odelay.Timers` use thread resources to do their work. In order for a jvm to be shutdown cleanly, these thread resources need to be released.
+A typical application should only use _one_ instance of an `odelay.Timer`.
+When an application terminates, it should ensure that the `stop()` method of that `odelay.Timer` is invoked.
 
 ### Periodic delays
 
-Odelay also provides an interface for use cases where you may wish to execute a task after a perodic delay. You can do so with the `odelay.Delay#every` interface which takes 3 argments, a `scala.concurrent.duration.FiniteDuration` representing the periodic delay, an optional `scala.concurrent.duration.FiniteDuration` representing the initial delay (the default is no delay), and a block of code to execute periodically.
+Odelay also provides an interface for usecases where you may wish to execute a task after a series of perodic delays.
+You can do so with the `odelay.Delay#every` interface which takes 3 argments: a `scala.concurrent.duration.FiniteDuration` representing the periodic delay, an optional `scala.concurrent.duration.FiniteDuration` representing the initial delay (the default is no delay), and a block of code to execute periodically.
 
 ```scala
+import scala.concurrent.duration._
 import odelay.Default.timer
 
 odelay.Delay.every(2.seconds)() {
@@ -116,8 +129,46 @@ odelay.Delay.every(2.seconds)() {
 ### Timeouts
 
 Like `scala.concurrent.Futures` which provide a interface for _reacting_ to change, odelay delays return an `odelay.Timeout` value which
-can be used to react to changes as well.
+can be used to react to changes as well. Rather than reactive to deferred execution you can think of this interface as reactive to delayed changes.
 
+`odelay.Timeouts` expose an `future` member which is a future that will be satisfied as a success with the return type of block supplied to `odelay.Delay` when the future is scheduled. `odelay.Timeouts` may be also be canceled. This cancelation will satisfy the future in a failure state. Using this interface you may chain dependent actions in a "data flow" fashion.
+
+```scala
+import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.global
+import odelay.Default.timer
+
+odelay.Delay(2.seconds) {
+  println("executed")
+}.future.onComplete {
+  case _ => println("task scheduled")
+}
+```
+
+Note, the import of the execution context. An implicit instance must be in scope for the invocation of a future's `onComplete` invocation.
+
+#### Periodic Timeout futures
+
+A periodic delay should intuitively never complete as `future#onComplete` as a future can only be satisified once.
+A cancelled periodic delay, however will still result in a future failure.
+
+```scala
+import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.global
+import odelay.Default.timer
+
+val timeout = odelay.Delay.every(2.seconds)() {
+  println("executed")
+}
+
+timeout.future.onComplete {
+  case _ => println("this will never get called")
+}
+
+timeout.future.onFailure {
+  case _ => println("this can get called, if you call timeout.cancel()")
+}
+```
 
 Doug Tangren (softprops) 2014
 
