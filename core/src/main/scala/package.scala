@@ -10,5 +10,8 @@
  *  These primatives can be used to complement the usage of scala.concurrent.Futures by defining
  *  a deterministic delay for the future operation as well as a way
  *  to cancel the future operation.
+ *
+ *  An odelay.Timeout is the result of a delay, defines a future which may be used to trigger dependant actions
+ *  and delay cancellations.
  */
 package object odelay
