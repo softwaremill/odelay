@@ -1,12 +1,12 @@
 # odelay
 
-A small set of primatives supporting delayed reactions.
+A small set of primatives supporting delayed reactions in scala, reusing what tools you have on hand.
 
 ## usage
 
-Odelay executes tasks after a specified [scala.concurrent.duration.FiniteDuration][fd].
-This differs from the behavior the default execution of [scala.concurrent.Futures][fut], which are executed at some non-deterministic time.
-`scala.concurrent.Futures` are useful primatives for deferring tasks that may take a non trival amount of time to execute.
+Odelay executes tasks after a specified [FiniteDuration][fd].
+This differs from the behavior the default execution of [Futures][fut], which are executed at some non-deterministic time.
+`Futures` are useful primatives for deferring tasks that may take a non trival amount of time to execute.
 Delayed operations are useful when you know up front when you want a given task to be executed.
 
 Odelay defines two primary primatives.
@@ -23,18 +23,18 @@ odelay.Delay(2.seconds) {
 }
 ```
 
-A delayed operation requires a `scala.concurrent.duration.FiniteDuration` and some arbitrary block of code to execute.
+A delayed operation requires a `FiniteDuration` and some arbitrary block of code to execute.
 
 ### Timers
 
-In order for the example above to compile, a `odelay.Timer` needs to be in, implicit scope.
+In order for the example above to compile, an `odelay.Timer` needs to be in implicit scope.
 
 `odelay.Timers` implement an interface for making the delay possible.
-Implementations for `odelay.Timers` are defined for a number of environments and platforms.
+Implementations for `odelay.Timers` are defined for a number of environments and platforms so you can make the most of the tools you alread have on hand.
 
 #### JdkTimer
 
-The default is a jdk backed Timer.
+The default Timer is a jdk backed Timer.
 
 To make the example above compile. Import the default `Timer`.
 
@@ -47,7 +47,7 @@ odelay.Delay(2.seconds) {
 }
 ```
 
-To be more flexible, if you already have a [ScheduledExecutorService][ses], you may define your own jdk timer with resources you've already allocated.
+For flexibility, if you already have a [ScheduledExecutorService][ses], you may define your own jdk timer with resources you've already allocated.
 
 ```scala
 import scala.concurrent.duration._
@@ -129,9 +129,9 @@ odelay.Delay.every(2.seconds)() {
 ### Timeouts
 
 Like `scala.concurrent.Futures` which provide a interface for _reacting_ to change, odelay delays return an `odelay.Timeout` value which
-can be used to react to changes as well. Rather than reactive to deferred execution you can think of this interface as reactive to delayed changes.
+can be used to react to delays.
 
-`odelay.Timeouts` expose an `future` member which is a future that will be satisfied as a success with the return type of block supplied to `odelay.Delay` when the future is scheduled. `odelay.Timeouts` may be also be canceled. This cancelation will satisfy the future in a failure state. Using this interface you may chain dependent actions in a "data flow" fashion.
+`odelay.Timeouts` expose an `future` member which is a `Future` that will be satisfied as a success with the return type of block supplied to `odelay.Delay` when the future is scheduled. `odelay.Timeouts` may be also be canceled. This cancelation will satisfy the future in a failure state. Using this interface you may chain dependent actions in a "data flow" fashion. Note, the return type of a Timeout is determined by the block of code supplied. If your block returns a Future itself, the timeouts future being satisfied doesn't imply the blocks future will also be satsified as well.
 
 ```scala
 import scala.concurrent.duration._
@@ -145,11 +145,11 @@ odelay.Delay(2.seconds) {
 }
 ```
 
-Note, the import of the execution context. An implicit instance must be in scope for the invocation of a future's `onSuccess` invocation.
+Note, the import of the execution context. An implicit instance of one must be in scope for the invocation of a future's `onSuccess`.
 
 #### Periodic Timeout futures
 
-A periodic delay should intuitively never complete as a future can only be satisified once.
+A periodic delay should intuitively never complete as a future can only be satisified once and a period deplay will be executed a number of times.
 A cancelled periodic delay, however will still result in a future failure.
 
 ```scala
