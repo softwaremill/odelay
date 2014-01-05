@@ -11,7 +11,7 @@ case class TwitterTimer(underlying: TwttrTimer) extends Timer {
     new Timeout[T] {
       val p = Promise[T]()
       val tto = underlying.schedule(
-        duration(delay))(p.success(op))
+        duration(delay).fromNow)(p.success(op))
       def future = p.future
       def cancel() {
         tto.cancel()
