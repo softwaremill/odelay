@@ -55,7 +55,7 @@ trait TimerSpec extends FunSpec with BeforeAndAfterAll {
 
     it ("should repeatedly execute an operation on a fixed delay") {
       val start = System.currentTimeMillis
-      val timeout = Delay.repeatedly(150.millis)() {
+      val timeout = Delay.every(150.millis)() {
         val diff = System.currentTimeMillis - start
         print('.')
         diff
@@ -67,7 +67,7 @@ trait TimerSpec extends FunSpec with BeforeAndAfterAll {
     }
 
     it ("cancellation of repeatedly delayed operations should result in future failure") {
-      val cancel = Delay.repeatedly(150.seconds)()(true)
+      val cancel = Delay.every(150.seconds)()(true)
       val counter = new AtomicInteger(0)
       cancel.future.onFailure {
         case NonFatal(e) =>

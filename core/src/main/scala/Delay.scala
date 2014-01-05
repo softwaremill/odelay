@@ -7,7 +7,7 @@ object Delay {
     todo: => T)(implicit timer: Timer): Timeout[T] =
     timer(delay, todo)
 
-  def repeatedly[T](every: FiniteDuration)(delay: FiniteDuration = Duration.Zero)(
+  def every[T](every: FiniteDuration)(delay: FiniteDuration = Duration.Zero)(
     todo: => T)(implicit timer: Timer): Timeout[T] =
     timer(delay, every, todo)
 }
