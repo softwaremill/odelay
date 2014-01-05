@@ -62,7 +62,7 @@ odelay.Delay(2.seconds) {
 #### Netty(3)Timers
 
 If your application is built with [netty][netty], there's a good chance you will want to use the `odelay-netty` ( netty 4 ) or `odelay-netty3` ( netty 3 )
-modules which are backed by a netty [HashedWhileTimer][hwt].
+modules which are backed by a netty [HashedWheelTimer][hwt].
 
 ```scala
 import scala.concurrent.duration._
@@ -140,16 +140,16 @@ import odelay.Default.timer
 
 odelay.Delay(2.seconds) {
   println("executed")
-}.future.onComplete {
+}.future.onSuccess {
   case _ => println("task scheduled")
 }
 ```
 
-Note, the import of the execution context. An implicit instance must be in scope for the invocation of a future's `onComplete` invocation.
+Note, the import of the execution context. An implicit instance must be in scope for the invocation of a future's `onSuccess` invocation.
 
 #### Periodic Timeout futures
 
-A periodic delay should intuitively never complete as `future#onComplete` as a future can only be satisified once.
+A periodic delay should intuitively never complete as a future can only be satisified once.
 A cancelled periodic delay, however will still result in a future failure.
 
 ```scala
@@ -161,7 +161,7 @@ val timeout = odelay.Delay.every(2.seconds)() {
   println("executed")
 }
 
-timeout.future.onComplete {
+timeout.future.onSuccess {
   case _ => println("this will never get called")
 }
 
