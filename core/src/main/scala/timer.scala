@@ -6,7 +6,8 @@ import scala.annotation.implicitNotFound
 import java.util.concurrent.CancellationException
 
 private [odelay] object Timeout {
-  private [odelay] def cancel[T](p: Promise[T]) = if (!p.isCompleted) p.failure(new CancellationException)
+  private [odelay] def cancel[T](p: Promise[T]) =
+    if (!p.isCompleted) p.failure(new CancellationException)
 }
 
 /** The result of a deferred execution */
@@ -21,16 +22,16 @@ trait Timeout[T] {
   def cancel(): Unit
 }
 
-/** The deferrer of some operation */
+/** The deferrer of some arbitrary operation */
 @implicitNotFound(
-  "Cannot find an implicit odelay.Timer, either define one yourself or import odelay.Default._")
+  "Cannot find an implicit odelay.Timer, either define one yourself or import odelay.Default.timer")
 trait Timer {
   /** Delays the execution of an operation until the provided duration */
   def apply[T](delay: FiniteDuration, op: => T): Timeout[T]
   /** Delays the execution of an operation until the provided deplay and then after, repeats the operation at the every duration after.
    *  Timeouts returned by this expose a Future that will never complete until cancelled */
   def apply[T](delay: FiniteDuration, every: FiniteDuration, todo: => T): Timeout[T]
-  /** Stops the timer and releases any retained resources */
+  /** Stops the timer and releases any retained resources. Once a Timer is stoped, it's behavior is undefined. */
   def stop(): Unit
 }
 
