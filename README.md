@@ -1,5 +1,7 @@
 # odelay
 
+[![Build Status](https://travis-ci.org/softprops/odelay.png?branch=master)](https://travis-ci.org/softprops/odelay)
+
 A small set of primatives supporting delayed reactions in scala, reusing what tools you have on hand.
 
 ## usage
