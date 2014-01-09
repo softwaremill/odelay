@@ -26,9 +26,7 @@ class JdkTimer(
     new Timeout[T] {
       val p = Promise[T]()
       val jfuture = underlying.schedule(new Runnable {
-        def run() {
-          p.success(op)
-        }
+        def run() = if (!p.isCompleted) p.success(op)
       }, delay.length, delay.unit)
       def future = p.future
       def cancel() = if (!jfuture.isCancelled) {
@@ -41,7 +39,7 @@ class JdkTimer(
     new Timeout[T] {
       val p = Promise[T]()
       val jfuture = underlying.scheduleWithFixedDelay(new Runnable {
-        def run = op
+        def run = if (p.isCompleted) op
       }, delay.toUnit(every.unit).toLong, every.length, every.unit)
       def future = p.future
       def cancel() = if (!jfuture.isCancelled) {
