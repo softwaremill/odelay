@@ -1,6 +1,6 @@
 package odelay.jdk
 
-import odelay.{ Timeout, Timer }
+import odelay.{ PromisingTimeout, Timeout, Timer }
 import scala.concurrent.Promise
 import scala.concurrent.duration.{ Duration, FiniteDuration }
 import java.util.concurrent.{
@@ -14,37 +14,36 @@ class JdkTimer(
   extends Timer {
 
   /** customizing constructor */
-  def this(poolSize: Int = Default.poolSize,
-           threads: ThreadFactory = Default.threadFactory,
-           handler: Option[RejectedExecutionHandler] = Default.rejectionHandler,
-           interruptOnCancel: Boolean = Default.interruptOnCancel) =
+  def this(
+    poolSize: Int = Default.poolSize,
+    threads: ThreadFactory = Default.threadFactory,
+    handler: Option[RejectedExecutionHandler] = Default.rejectionHandler,
+    interruptOnCancel: Boolean = Default.interruptOnCancel) =
     this(handler.map( rejections => new ScheduledThreadPoolExecutor(poolSize, threads, rejections))
                 .getOrElse(new ScheduledThreadPoolExecutor(poolSize, threads)),
          interruptOnCancel)
 
   def apply[T](delay: FiniteDuration, op: => T): Timeout[T] =
-    new Timeout[T] {
-      val p = Promise[T]()
+    new PromisingTimeout[T] {
       val jfuture = underlying.schedule(new Runnable {
-        def run() = if (!p.isCompleted) p.success(op)
+        def run() = completePromise(op)
       }, delay.length, delay.unit)
-      def future = p.future
+
       def cancel() = if (!jfuture.isCancelled) {
         jfuture.cancel(interruptOnCancel)
-        Timeout.cancel(p)
+        cancelPromise()
       }
     }
 
   def apply[T](delay: FiniteDuration, every: FiniteDuration, op: => T): Timeout[T] =
-    new Timeout[T] {
-      val p = Promise[T]()
+    new PromisingTimeout[T] {
       val jfuture = underlying.scheduleWithFixedDelay(new Runnable {
-        def run = if (p.isCompleted) op
+        def run = if (promiseIncomplete) op
       }, delay.toUnit(every.unit).toLong, every.length, every.unit)
-      def future = p.future
+
       def cancel() = if (!jfuture.isCancelled) {
         jfuture.cancel(interruptOnCancel)
-        Timeout.cancel(p)
+        cancelPromise()
       }
     }
 

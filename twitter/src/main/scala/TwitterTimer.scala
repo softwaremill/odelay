@@ -1,34 +1,32 @@
 package odelay.twitter
 
-import odelay.{ Timeout, Timer }
-import com.twitter.util.{ Duration, JavaTimer, Timer => TwttrTimer, TimerTask }
+import odelay.{ PromisingTimeout, Timeout, Timer }
+import com.twitter.util.{ Duration, JavaTimer, Timer => TwttrTimer }
 import scala.concurrent.Promise
 import scala.concurrent.duration.FiniteDuration
 
-case class TwitterTimer(underlying: TwttrTimer) extends Timer {
+case class TwitterTimer(underlying: TwttrTimer)
+  extends Timer {
 
   def apply[T](delay: FiniteDuration, op: => T): Timeout[T] =
-    new Timeout[T] {
-      val p = Promise[T]()
+    new PromisingTimeout[T] {
       val tto = underlying.schedule(
-        duration(delay).fromNow)(p.success(op))
-      def future = p.future
+        duration(delay).fromNow)(completePromise(op))
       def cancel() {
         tto.cancel()
-        Timeout.cancel(p)
+        cancelPromise()
       }
     }
 
-  def apply[T](delay: FiniteDuration, every: FiniteDuration, op: => T): Timeout[T] =
-    new Timeout[T] {
-      val p = Promise[T]()
+  def apply[T](
+    delay: FiniteDuration, every: FiniteDuration, op: => T): Timeout[T] =
+    new PromisingTimeout[T] {
       val tto = underlying.schedule(
         duration(delay).fromNow,
         duration(every))(op)
-      def future = p.future
       def cancel() {
         tto.cancel()
-        Timeout.cancel(p)
+        cancelPromise()
       }
     }
 
