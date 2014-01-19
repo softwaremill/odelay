@@ -2,19 +2,21 @@
 
 [![Build Status](https://travis-ci.org/softprops/odelay.png?branch=master)](https://travis-ci.org/softprops/odelay)
 
-A small set of primatives supporting delayed reactions in scala, reusing what tools you have on hand.
+A small set of primitives supporting delayed reactions in scala, reusing what tools you have on hand.
 
 ## usage
 
 Odelay executes tasks after a specified [FiniteDuration][fd].
-This differs from the behavior the default execution of [Futures][fut], which are executed at some non-deterministic time.
-`Futures` are useful primatives for deferring tasks that may take a non trival amount of time to execute.
+This differs from the default behavior [Futures][fut], which are executed at some non-deterministic time.
+
+`Futures` are useful primitives for deferring tasks that may take a non trival amount of time to execute.
+
 Delayed operations are useful when you know up front when you want a given task to be executed.
 
-Odelay defines two primary primatives.
+Odelay defines two primary primitives.
 
-An `odelay.Timer` which executes a tasks after the provided delay and an `odelay.Timeout` which is the result of an `odelay.Timers` task application.
-These primatives often work offstage, unseen by user code.
+An `odelay.Timer` which executes a tasks after the provided delay and an `odelay.Timeout` which is the result of an `odelay.Timer's` task application.
+These primitives often operate offstage, unseen by user code.
 
 The interface for delaying tasks is `odelay.Delay`.
 
@@ -25,7 +27,7 @@ odelay.Delay(2.seconds) {
 }
 ```
 
-A delayed operation requires a `FiniteDuration` and some arbitrary block of code to execute.
+A delayed operation requires a `FiniteDuration` and some arbitrary block of code to execute after that delay.
 
 ### Timers
 
