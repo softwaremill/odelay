@@ -1,8 +1,8 @@
 package odelay.netty
 
-import odelay.{ PromisingTimeout, Timeout, Timer }
+import odelay.{ Delay, PromisingDelay, Timer }
 import io.netty.util.{
-  HashedWheelTimer, Timeout => NTimeout, Timer => NTimer, TimerTask }
+  HashedWheelTimer, Timeout, Timer => NTimer, TimerTask }
 import scala.concurrent.Promise
 import scala.concurrent.duration.FiniteDuration
 import java.util.concurrent.{ ThreadFactory, TimeUnit }
@@ -15,8 +15,8 @@ class NettyGroupTimer(
   interruptOnCancel: Boolean = Default.interruptOnCancel)
   extends Timer {
 
-  def apply[T](delay: FiniteDuration, op: => T): Timeout[T] =
-    new PromisingTimeout[T] {
+  def apply[T](delay: FiniteDuration, op: => T): Delay[T] =
+    new PromisingDelay[T] {
       val sf = grp.schedule(new Runnable {
         def run = completePromise(op)
       }, delay.length, delay.unit)
@@ -28,8 +28,8 @@ class NettyGroupTimer(
     }
 
   def apply[T](
-    delay: FiniteDuration, every: FiniteDuration, op: => T): Timeout[T] =
-    new PromisingTimeout[T] {
+    delay: FiniteDuration, every: FiniteDuration, op: => T): Delay[T] =
+    new PromisingDelay[T] {
       val p = Promise[T]()
       val sf = grp.scheduleWithFixedDelay(new Runnable {
         def run = if (promiseIncomplete) op
@@ -47,10 +47,10 @@ class NettyGroupTimer(
 class NettyTimer(underlying: NTimer = new HashedWheelTimer)
   extends Timer {
 
-  def apply[T](delay: FiniteDuration, op: => T): Timeout[T] =
-    new PromisingTimeout[T] {
+  def apply[T](delay: FiniteDuration, op: => T): Delay[T] =
+    new PromisingDelay[T] {
       val to = underlying.newTimeout(new TimerTask {
-        def run(timeout: NTimeout) =
+        def run(timeout: Timeout) =
           completePromise(op)
       }, delay.length, delay.unit)
 
@@ -61,24 +61,24 @@ class NettyTimer(underlying: NTimer = new HashedWheelTimer)
     }
 
   def apply[T](
-    delay: FiniteDuration, every: FiniteDuration, op: => T): Timeout[T] =
-    new PromisingTimeout[T] {
-      var nextTimeout: Option[Timeout[T]] = None
+    delay: FiniteDuration, every: FiniteDuration, op: => T): Delay[T] =
+    new PromisingDelay[T] {
+      var nextDelay: Option[Delay[T]] = None
       val to = underlying.newTimeout(new TimerTask {
-        def run(timeout: NTimeout) = loop()
+        def run(timeout: Timeout) = loop()
       }, delay.length, delay.unit)
 
       def loop() =
         if (promiseIncomplete) {
           op
-          nextTimeout = Some(apply(every, every, op))
+          nextDelay = Some(apply(every, every, op))
         }
 
       def cancel() =
         if (!to.isCancelled) {
           synchronized {
             to.cancel()
-            nextTimeout.foreach(_.cancel())
+            nextDelay.foreach(_.cancel())
             cancelPromise()
           }
         }

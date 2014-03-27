@@ -15,8 +15,7 @@ Delayed operations are useful when you know when you want a given task to be exe
 
 Odelay defines two primary primitives.
 
-An `odelay.Timer` which executes a task after the provided delay and an `odelay.Timeout` which is the result of an `odelay.Timer's` task application.
-These primitives often operate offstage, unseen by user code.
+An `odelay.Timer` which executes a task after the provided delay and an `odelay.Delay` which is the result of an `odelay.Timer's` task application.
 
 The interface for delaying tasks is `odelay.Delay`.
 
@@ -144,12 +143,12 @@ odelay.Delay.every(2.seconds)() {
 }
 ```
 
-### Timeouts
+### Delays
 
-Like `scala.concurrent.Futures` which provide a interface for _reacting_ to change, odelay delays return an `odelay.Timeout` value which
+Like `scala.concurrent.Futures` which provide a interface for _reacting_ to change, odelay delays return an `odelay.Delay` value which
 can be used to react to delays.
 
-Since these are essential deferred values, `odelay.Timeouts` expose an `future` member which is a `Future` that will be satisfied as a success with the return type of block supplied to `odelay.Delay` when the future is scheduled. `odelay.Timeouts` may be also be canceled. This cancelation will satisfy the future in a failure state. Using this interface you may chain dependent actions in a "data flow" fashion. Note, the return type of a Timeout is determined by the block of code supplied. If your block returns a Future itself, the timeouts future being satisfied doesn't imply the blocks future will also be satsified as well.
+Since these are essentially deferred values, `odelay.Delays` expose an `future` member which is a `Future` that will be satisfied as a success with the return type of block supplied to `odelay.Delay` when the future is scheduled. `odelay.Delays` may be also be canceled. This cancelation will satisfy the future in a failure state. Using this interface you may chain dependent actions in a "data flow" fashion. Note, the return type of a Delay is determined by the block of code supplied. If your block returns a Future itself, the delay's future being satisfied doesn't imply the blocks future will also be satsified as well.
 
 ```scala
 import scala.concurrent.duration._
@@ -165,7 +164,7 @@ odelay.Delay(2.seconds) {
 
 Note, the import of the execution context. An implicit instance of one must be in scope for the invocation of a future's `onSuccess`.
 
-#### Periodic Timeout futures
+#### Periodicly Delayed futures
 
 A periodic delay should intuitively never complete as a future can only be satisified once and a period deplay will be executed a number of times.
 A cancelled periodic delay, however will still result in a future failure.
@@ -175,16 +174,16 @@ import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import odelay.Default.timer
 
-val timeout = odelay.Delay.every(2.seconds)() {
+val delay = odelay.Delay.every(2.seconds)() {
   println("executed")
 }
 
-timeout.future.onSuccess {
+delay.future.onSuccess {
   case _ => println("this will never get called")
 }
 
-timeout.future.onFailure {
-  case _ => println("this can get called, if you call timeout.cancel()")
+delay.future.onFailure {
+  case _ => println("this can get called, if you call delay.cancel()")
 }
 ```
 

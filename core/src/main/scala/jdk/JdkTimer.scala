@@ -1,6 +1,6 @@
 package odelay.jdk
 
-import odelay.{ PromisingTimeout, Timeout, Timer }
+import odelay.{ PromisingDelay, Delay, Timer }
 import scala.concurrent.Promise
 import scala.concurrent.duration.{ Duration, FiniteDuration }
 import java.util.concurrent.{
@@ -23,8 +23,8 @@ class JdkTimer(
                 .getOrElse(new ScheduledThreadPoolExecutor(poolSize, threads)),
          interruptOnCancel)
 
-  def apply[T](delay: FiniteDuration, op: => T): Timeout[T] =
-    new PromisingTimeout[T] {
+  def apply[T](delay: FiniteDuration, op: => T): Delay[T] =
+    new PromisingDelay[T] {
       val jfuture = underlying.schedule(new Runnable {
         def run() = completePromise(op)
       }, delay.length, delay.unit)
@@ -35,8 +35,8 @@ class JdkTimer(
       }
     }
 
-  def apply[T](delay: FiniteDuration, every: FiniteDuration, op: => T): Timeout[T] =
-    new PromisingTimeout[T] {
+  def apply[T](delay: FiniteDuration, every: FiniteDuration, op: => T): Delay[T] =
+    new PromisingDelay[T] {
       val jfuture = underlying.scheduleWithFixedDelay(new Runnable {
         def run = if (promiseIncomplete) op
       }, delay.toUnit(every.unit).toLong, every.length, every.unit)
