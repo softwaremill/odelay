@@ -187,7 +187,6 @@ delay.future.onFailure {
 }
 ```
 
-
 Doug Tangren (softprops) 2014
 
 [fd]: http://www.scala-lang.org/api/current/index.html#scala.concurrent.duration.FiniteDuration
