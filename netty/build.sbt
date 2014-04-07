@@ -1,1 +1,1 @@
-libraryDependencies += "io.netty" % "netty-common" % "4.0.17.Final"
+libraryDependencies += "io.netty" % "netty-common" % "4.0.18.Final"
