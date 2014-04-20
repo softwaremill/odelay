@@ -5,25 +5,30 @@ import scala.concurrent.duration.{ Duration, FiniteDuration }
 import java.util.concurrent.CancellationException
 
 object Delay {  
-  def apply[T](delay: FiniteDuration)(
-    todo: => T)(implicit timer: Timer): Delay[T] =
-    timer(delay, todo)
+  def apply[T]
+    (delay: FiniteDuration)
+    (todo: => T)
+    (implicit timer: Timer): Delay[T] =
+     timer(delay, todo)
 
-  def every[T](every: FiniteDuration)(delay: FiniteDuration = Duration.Zero)(
-    todo: => T)(implicit timer: Timer): Delay[T] =
-    timer(delay, every, todo)
+  def every[T]
+    (every: FiniteDuration)
+    (delay: FiniteDuration = Duration.Zero)
+    (todo: => T)
+    (implicit timer: Timer): Delay[T] =
+     timer(delay, every, todo)
 
   private [odelay] def cancel[T](p: Promise[T]) =
     if (!p.isCompleted) p.failure(new CancellationException)
 }
 
-/** The result of a deferred execution */
+/** The result of Delayed operation */
 trait Delay[T] {
-  /** @return a Future represent the execution of the Timeouts operation. Timeouts returned
-   *          by repeated delays expose a future that will never complete until cancelled */
+  /** @return a Future represent the execution of the Delays operation. Delays
+   *          to be repeated expose a future that will never complete until cancelled */
   def future: Future[T]
 
-  /** Cancels the execution of the deferred operation. Once a Timeout
+  /** Cancels the execution of the delayed operation. Once a Delay
    *  is canceled, if additional attempts to cancel will result in undefined
    *  behavior */
   def cancel(): Unit
