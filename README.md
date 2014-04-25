@@ -174,7 +174,7 @@ However, a canceled periodic delay will satisfy a periodic dealys Future in a fa
 ```scala
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
-import odelay.Default.timer
+import odelay.jdk.Default.timer
 
 val delay = odelay.Delay.every(2.seconds)() {
   println("executed")
