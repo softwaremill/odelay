@@ -141,9 +141,13 @@ odelay.Delay.every(2.seconds)() {
 
 ### Delays
 
-Like [Futures][fut], which provide a interface for _reacting_ to change, odelay delays return an `odelay.Delay` value which can be used to react to delays.
+Like [Futures][fut], which provide a interface for _reacting_ to change, odelay delays return an `odelay.Delay` value which can be used to _react_ to delays.
 
-Since delays are essentially deferred operations, `odelay.Delays` expose an `future` member which returns a `Future` that will be satisfied as a success with the return type of block supplied to `odelay.Delay` when the future is scheduled. `odelay.Delays` may be also be canceled. This cancellation will satisfy the future in a failure state. Using this interface you may chain dependent actions in a "data flow" fashion. Note, the return type of a Delay is determined by the block of code supplied. If your block returns a Future itself, the delay's future being satisfied doesn't imply the blocks future will also be satisfied as well. If you which to chain these, simply `flatMap` the results.
+Since delays are essentially deferred operations, `odelay.Delays` expose a `future` method which returns a `Future` that will be satisfied as a success with the return type of block supplied to `odelay.Delay` when the future is scheduled. 
+
+`odelay.Delays` may be also be canceled. This cancellation will satisfy the future in a failure state. Armed with this knowledge, you can chain dependent actions in a "data flow" fashion. Note, the return type of a Delay's Future is determined by the block of code supplied. If your block returns a Future itself, the Delay's future being satisfied doesn't imply the blocks future will also be satisfied as well. If you wish to chain these together, simply `flatMap` the results, `delay.future.flatMap(identity)`.
+
+Below is an example of reacting the a delay's execution.
 
 ```scala
 import scala.concurrent.duration._
@@ -159,12 +163,13 @@ odelay.Delay(2.seconds) {
 }
 ```
 
-Note, the import of the execution context. An implicit instance of one must be in scope for the invocation of a future's `onSuccess`.
+Note, the import of the `ExecutionContext`. An implicit instance of one must be in scope for the invocation of a Future's `onSuccess` method.
 
 #### Periodically Delayed futures
 
-A periodic delay should intuitively never complete as a future can only be satisfied once and a period delay will be executed a number of times.
-A canceled periodic delay, however will still result in a future failure.
+A periodic delay should intuitively never complete, as a Future can only be satisfied once and a period delay will be executed a number of times.
+
+However, a canceled periodic delay will satisfy a periodic dealys Future in a failure state.
 
 ```scala
 import scala.concurrent.duration._
@@ -183,7 +188,6 @@ delay.future.onFailure {
   case _ => println("this can get called, if you call delay.cancel()")
 }
 ```
-
 
 Doug Tangren (softprops) 2014
 
