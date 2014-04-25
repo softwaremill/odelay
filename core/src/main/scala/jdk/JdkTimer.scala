@@ -6,6 +6,7 @@ import scala.concurrent.duration.{ Duration, FiniteDuration }
 import java.util.concurrent.{
   RejectedExecutionHandler, ScheduledExecutorService,
   ScheduledThreadPoolExecutor, ThreadFactory }
+import java.util.concurrent.atomic.AtomicInteger
 
 /** A Timer implemented in terms of a jdk ScheduledThreadPoolExecutor */
 class JdkTimer(
@@ -50,13 +51,17 @@ class JdkTimer(
   def stop() = if (!underlying.isShutdown) underlying.shutdownNow()
 }
 
-
 /** defaults for jdk timers */
 object Default {
   lazy val poolSize = Runtime.getRuntime().availableProcessors()
   lazy val threadFactory: ThreadFactory = new ThreadFactory {
+    val grp = new ThreadGroup(
+      Thread.currentThread().getThreadGroup(), "odelay")
+    val threads = new AtomicInteger(1)
     def newThread(runs: Runnable) =
-      new Thread(runs) {
+      new Thread(
+        grp, runs,
+        "odelay-%s" format threads.getAndIncrement()) {
         setDaemon(true)
       }
   }
