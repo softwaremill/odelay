@@ -1,14 +1,13 @@
 package odelay.netty
 
 import odelay.{ Delay, PromisingDelay, Timer }
+import odelay.jdk.{ Default => JdkDefault }
 import io.netty.util.{
   HashedWheelTimer, Timeout, Timer => NTimer, TimerTask }
+import io.netty.util.concurrent.EventExecutorGroup
 import scala.concurrent.Promise
 import scala.concurrent.duration.FiniteDuration
-import java.util.concurrent.{ ThreadFactory, TimeUnit }
-import java.util.concurrent.atomic.AtomicInteger
-
-import io.netty.util.concurrent.EventExecutorGroup
+import java.util.concurrent.TimeUnit
 
 class NettyGroupTimer(
   grp: EventExecutorGroup,
@@ -91,16 +90,9 @@ object Default {
   val interruptOnCancel = true
   def groupTimer(grp: EventExecutorGroup) =
     new NettyGroupTimer(grp)
-  /** @return a new NettyTimer backed by a HashedWheelTimer */
-  def timer: Timer = new NettyTimer(new HashedWheelTimer(new ThreadFactory {
-    val grp = new ThreadGroup(
-      Thread.currentThread().getThreadGroup(), "odelay")
-    val threads = new AtomicInteger(1)
-    def newThread(runs: Runnable) =
-      new Thread(
-        grp, runs,
-        "odelay-%s" format threads.getAndIncrement()) {
-          setDaemon(true)
-        }
-  }, 10, TimeUnit.MILLISECONDS))
+  /** @return a _new_ NettyTimer backed by a HashedWheelTimer */
+  def timer: Timer = new NettyTimer(
+    new HashedWheelTimer(
+      JdkDefault.threadFactory,
+      10, TimeUnit.MILLISECONDS))
 }
