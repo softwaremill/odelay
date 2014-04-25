@@ -2,9 +2,9 @@ libraryDependencies <+= (scalaVersion) {
   case rewrite if rewrite.startsWith("2.9.3") =>
     "com.twitter" % "util-core_2.9.2"  % "6.13.2"
   case _ =>
-    "com.twitter" %% "util-core" % "6.13.2"
+    "com.twitter" %% "util-core" % "6.14.0"
 }
 
-description := "provides a deferred.Timer implementation backed by a com.twitter.util.Timer"
+description := "an odelay.Timer implementation backed by a com.twitter.util.Timer"
 
-scalaVersion := "2.10.3"
+crossScalaVersions := Seq("2.9.3", "2.10.4")
