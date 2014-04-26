@@ -6,13 +6,13 @@ Delayed reactions, made from tools you already have on hand.
 
 ## usage
 
-Odelay delays the execution of tasks for a specified [FiniteDurations][fd].
+Odelay delays the execution of operations for a specified [FiniteDurations][fd].
 
-This differs from Scala [Futures][fut], which defer the execution of task for some non-deterministic time.
+This differs from Scala [Futures][fut], which represent deferred values, which are defined at a non-deterministic time.
 
 Odelay defines two simple primitives.
 
-An `odelay.Timer` which defers task execution and an `odelay.Delay` which represents a delayed operation. These separate execution from interface.
+An `odelay.Timer`, which defers task execution, and an `odelay.Delay`, which represents a delayed operation. These separate execution from interface.
 
 Typical usage is as follows.
 
@@ -27,15 +27,15 @@ A delayed operation requires a [FiniteDuration][fd] and some arbitrary block of 
 
 ### Timers
 
-In order for the example above to compile, an instance of an `odelay.Timer` needs to be in implicit scope, as you would an ExecutionContext for Scala Futures.
+In order for the example above to compile, an instance of an `odelay.Timer` needs to be in implicit scope, as an ExecutionContext would when working with Scala Futures.
 
-`odelay.Timers` defined an interface for task scheduling. Implementations of `odelay.Timers` are defined for a number of environments and platforms so you can make the most of the tools you alread have on hand.
+`odelay.Timers` define an interface for task scheduling. Implementations of `odelay.Timers` are defined for a number of environments and platforms so you can make the most of the tools you already have on hand.
 
 #### JdkTimer
 
 The default Timer is a standard jdk [ScheduledExecutorService][ses] backed Timer.
 
-To make the example above compile. Import the default `Timer`.
+To make the example above compile, import the default `Timer`.
 
 ```scala
 import scala.concurrent.duration._
@@ -60,7 +60,7 @@ odelay.Delay(2.seconds) {
 
 #### Netty(3)Timers
 
-If your application classpath includes [netty][netty], a widely adopted libary for writing asynchrous services on the JVM, there's a good chance you will want to use the `odelay-netty` ( netty 4 ) or `odelay-netty3` ( netty 3 ) modules which are backed by a netty [HashedWheelTimer][hwt].
+If your application's classpath includes [netty][netty], a widely adopted library for writing asynchronous services on the JVM, there's a good chance you will want to use the `odelay-netty` ( netty 4 ) or `odelay-netty3` ( netty 3 ) modules which are backed by a netty [HashedWheelTimer][hwt].
 
 To use one of these, bring the default netty timer into scope
 
@@ -73,7 +73,7 @@ odelay.Delay(2.seconds) {
 }
 ```
 
-If your application has already allocated a HashedWheelTimer, you can easily create an odelay Timer with that instead.
+If your application has already allocated a HashedWheelTimer, you can easily create an odelay.Timer with that instead.
 
 ```scala
 import scala.concurrent.duration._
@@ -83,7 +83,7 @@ odelay.Delay(2.seconds) {
 }
 ```
 
-Netty 4+ defines a new concurrency primative called an `io.netty.util.concurrent.EventExecutorGroup`. Odelay's netty module defines a Timer interface for that as well. You will most likely have an EventExecutorGroup defines in your
+Netty 4+ defines a new concurrency primotive called an `io.netty.util.concurrent.EventExecutorGroup`. Odelay's netty module defines a Timer interface for that as well. You will most likely have an EventExecutorGroup defines in your
 netty pipeline. To create a Timer from one of those, you can do the following
 
 ```scala
@@ -97,7 +97,7 @@ odelay.Delay(2.seconds) {
 
 #### TwitterTimers
 
-If your application is has the [twitter util][tu] suite of utilities on your classpath, there's a good chance you will want to use the `odelay-twitter` module which defines an `odelay.Timer` in terms of twitter util's own timer interface, `com.twitter.util.Timer`. A default Timer is provided backed by a `com.twitter.util.JavaTimer`
+If your application has the [twitter util][tu] suite of utilities on its classpath, there's a good chance you will want to use the `odelay-twitter` module which defines an `odelay.Timer` in terms of twitter util's own timer interface, `com.twitter.util.Timer`. A default Timer is provided backed by a `com.twitter.util.JavaTimer`
 
 ```scala
 import scala.concurrent.duration._
@@ -125,8 +125,8 @@ When an application terminates, it should ensure be instrumented in a way that t
 
 ### Periodic delays
 
-Odelay also provides an interface for usecases where you wish to execute a task on a repeating series of perodic delays.
-You can do so with the `odelay.Delay#every` interface which takes 3 curried argments: a `scala.concurrent.duration.FiniteDuration` representing the periodic delay, an optional `scala.concurrent.duration.FiniteDuration` representing the initial delay (the default is no delay), and a block of code to execute periodically.
+Odelay also provides an interface for usecases where you wish to execute a task on a repeating series of periodic delays.
+You can do so with the `odelay.Delay#every` interface which takes 3 curried arguments: a `scala.concurrent.duration.FiniteDuration` representing the periodic delay, an optional `scala.concurrent.duration.FiniteDuration` representing the initial delay (the default is no delay), and a block of code to execute periodically.
 
 The following example will print "executed" every two seconds until the resulting time out is canceled or the timer is stopped.
 
@@ -169,7 +169,7 @@ Note, the import of the `ExecutionContext`. An implicit instance of one must be 
 
 A periodic delay should intuitively never complete, as a Future can only be satisfied once and a period delay will be executed a number of times.
 
-However, a canceled periodic delay will satisfy a periodic dealys Future in a failure state.
+However, a canceled periodic delay will satisfy a periodic delay's Future in a failure state.
 
 ```scala
 import scala.concurrent.duration._
