@@ -1,1 +1,1 @@
-description := "provides primatives for delpaying execution of operations"
+description := "provides primatives for delaying execution of operations"
