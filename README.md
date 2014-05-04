@@ -2,17 +2,19 @@
 
 [![Build Status](https://travis-ci.org/softprops/odelay.png?branch=master)](https://travis-ci.org/softprops/odelay)
 
-Delayed reactions, made from tools you already have on hand.
+Delayed reactions, fashioned from tools you already have on hand.
 
 ## usage
 
-Odelay delays the execution of operations for a specified [FiniteDurations][fd].
+Odelay provides a simple interface producing Delays, which represent operations delayed for a specified [FiniteDurations][fd] in a non-blocking way.
 
-This differs from Scala [Futures][fut], which represent deferred values, which are defined at a non-deterministic time.
+This differs from Scala [Futures][fut], which represent deferred values, which become defined at a non-deterministic time and are not cancelable.
 
-Odelay defines two simple primitives.
+### primitives
 
-An `odelay.Timer`, which defers task execution, and an `odelay.Delay`, which represents a delayed operation. These separate execution from interface.
+Odelay attempts to separate execution from interface by defining two primitives: an `odelay.Timer`, which defers task execution, and an `odelay.Delay`, which represents a delayed operation.
+
+A delayed operation requires a [FiniteDuration][fd] and some arbitrary block of code to execute after that delay.
 
 Typical usage is as follows.
 
@@ -23,13 +25,11 @@ odelay.Delay(2.seconds) {
 }
 ```
 
-A delayed operation requires a [FiniteDuration][fd] and some arbitrary block of code to execute after that delay.
-
 ### Timers
 
 In order for the example above to compile, an instance of an `odelay.Timer` needs to be in implicit scope, as an ExecutionContext would when working with Scala Futures.
 
-`odelay.Timers` define an interface for task scheduling. Implementations of `odelay.Timers` are defined for a number of environments and platforms so you can make the most of the tools you already have on hand.
+`odelay.Timers` define an interface for task scheduling. Implementations of `odelay.Timers` are defined for a number of environments and platforms.
 
 #### JdkTimer
 
@@ -83,7 +83,7 @@ odelay.Delay(2.seconds) {
 }
 ```
 
-Netty 4+ defines a new concurrency primotive called an `io.netty.util.concurrent.EventExecutorGroup`. Odelay's netty module defines a Timer interface for that as well. You will most likely have an EventExecutorGroup defines in your
+Netty 4+ defines a new concurrency primitive called an `io.netty.util.concurrent.EventExecutorGroup`. Odelay's netty module defines a Timer interface for that as well. You will most likely have an EventExecutorGroup defines in your
 netty pipeline. To create a Timer from one of those, you can do the following
 
 ```scala
@@ -143,7 +143,7 @@ odelay.Delay.every(2.seconds)() {
 
 Like [Futures][fut], which provide a interface for _reacting_ to change, odelay delays return an `odelay.Delay` value which can be used to _react_ to delays.
 
-Since delays are essentially deferred operations, `odelay.Delays` expose a `future` method which returns a `Future` that will be satisfied as a success with the return type of block supplied to `odelay.Delay` when the future is scheduled. 
+Since Delays represent deferred operations, `odelay.Delays` expose a `future` method which returns a `Future` that will be satisfied as a success with the return type of block supplied to `odelay.Delay` when the future is scheduled. 
 
 `odelay.Delays` may be also be canceled. This cancellation will satisfy the future in a failure state. Armed with this knowledge, you can chain dependent actions in a "data flow" fashion. Note, the return type of a Delay's Future is determined by the block of code supplied. If your block returns a Future itself, the Delay's future being satisfied doesn't imply the blocks future will also be satisfied as well. If you wish to chain these together, simply `flatMap` the results, `delay.future.flatMap(identity)`.
 
