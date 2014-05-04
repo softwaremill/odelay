@@ -8,7 +8,7 @@ Delayed reactions, fashioned from tools you already have on hand.
 
 Odelay provides a simple interface producing Delays, which represent operations delayed for a specified [FiniteDurations][fd] in a non-blocking way.
 
-This differs from Scala [Futures][fut], which represent deferred values, which become defined at a non-deterministic time and are not cancelable.
+This differs from Scala [Futures][fut], which represent deferred values, which become defined at some non-deterministic time and are not cancelable.
 
 ### primitives
 
