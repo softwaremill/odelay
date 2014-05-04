@@ -1,6 +1,7 @@
 package odelay.netty
 
 import odelay.{ Delay, PromisingDelay, Timer }
+import odelay.jdk.{ Default => JdkDefault }
 import org.jboss.netty.util.{
   HashedWheelTimer, Timeout, Timer => NTimer, TimerTask }
 import scala.concurrent.Promise
@@ -50,15 +51,8 @@ class NettyTimer(underlying: NTimer = new HashedWheelTimer)
 }
 
 object Default {
-  def timer: Timer = new NettyTimer(new HashedWheelTimer(new ThreadFactory {
-    val grp = new ThreadGroup(
-      Thread.currentThread().getThreadGroup(), "odelay")
-    val threads = new AtomicInteger(1)
-    def newThread(runs: Runnable) =
-      new Thread(
-        grp, runs,
-        "odelay-%s" format threads.getAndIncrement()) {
-          setDaemon(true)
-        }
-  }, 10, TimeUnit.MILLISECONDS))
+  def newTimer: Timer = new NettyTimer(
+    new HashedWheelTimer(
+      JdkDefault.threadFactory,
+      10, TimeUnit.MILLISECONDS))
 }

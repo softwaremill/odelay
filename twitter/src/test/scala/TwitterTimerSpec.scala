@@ -1,6 +1,6 @@
 package odelay.twitter
 
 class TwitterTimerSpec extends odelay.testing.TimerSpec {
-  def newTimer = Default.timer
+  def newTimer = Default.newTimer
   def timerName = "TwitterTimer"
 }

@@ -91,7 +91,7 @@ object Default {
   def groupTimer(grp: EventExecutorGroup) =
     new NettyGroupTimer(grp)
   /** @return a _new_ NettyTimer backed by a HashedWheelTimer */
-  def timer: Timer = new NettyTimer(
+  def newTimer: Timer = new NettyTimer(
     new HashedWheelTimer(
       JdkDefault.threadFactory,
       10, TimeUnit.MILLISECONDS))

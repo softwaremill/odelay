@@ -38,5 +38,5 @@ case class TwitterTimer(underlying: TwttrTimer)
 
 object Default {
   /** Default twitter timer backed by a com.twitter.util.JavaTimer */
-  def timer: Timer = new TwitterTimer(new JavaTimer(true))
+  def newTimer: Timer = new TwitterTimer(new JavaTimer(true))
 }

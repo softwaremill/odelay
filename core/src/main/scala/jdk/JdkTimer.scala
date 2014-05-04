@@ -54,7 +54,7 @@ class JdkTimer(
 /** defaults for jdk timers */
 object Default {
   lazy val poolSize = Runtime.getRuntime().availableProcessors()
-  lazy val threadFactory: ThreadFactory = new ThreadFactory {
+  def threadFactory: ThreadFactory = new ThreadFactory {
     val grp = new ThreadGroup(
       Thread.currentThread().getThreadGroup(), "odelay")
     val threads = new AtomicInteger(1)
@@ -68,6 +68,6 @@ object Default {
   val rejectionHandler: Option[RejectedExecutionHandler] = None
   val interruptOnCancel = true
   /** @return a _new_ Timer. when used clients should be sure to call stop() on all instances for a clean shutdown */
-  def timer: Timer = new JdkTimer(
+  def newTimer: Timer = new JdkTimer(
     poolSize, threadFactory, rejectionHandler, interruptOnCancel)
 }
