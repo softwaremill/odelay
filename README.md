@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/softprops/odelay.png?branch=master)](https://travis-ci.org/softprops/odelay)
 
-Delayed reactions, fashioned from tools you already have on hand.
+Delayed reactions, fashioned from tools you already have sitting in your shed.
 
 ## usage
 
