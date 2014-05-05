@@ -6,13 +6,14 @@ Delayed reactions, fashioned from tools you already have on hand.
 
 ## usage
 
-Odelay provides a simple interface producing Delays, which represent operations delayed for a specified [FiniteDurations][fd] in a non-blocking way.
-
-This differs from Scala [Futures][fut], which represent deferred values, which become defined at some non-deterministic time and are not cancelable.
+Odelay provides a simple interface producing Delays. Delays are to operations as Futures are to values, for given [FiniteDurations][fd].
 
 ### primitives
 
-Odelay attempts to separate execution from interface by defining two primitives: an `odelay.Timer`, which defers task execution, and an `odelay.Delay`, which represents a delayed operation.
+Odelay attempts to separate execution from interface by defining two primitives:
+
+* an `odelay.Timer`, which defers task execution
+* an `odelay.Delay`, which represents a delayed operation.
 
 A delayed operation requires a [FiniteDuration][fd] and some arbitrary block of code to execute after that delay.
 
@@ -27,7 +28,7 @@ odelay.Delay(2.seconds) {
 
 ### Timers
 
-In order for the example above to compile, an instance of an `odelay.Timer` needs to be in implicit scope, as an ExecutionContext would when working with Scala Futures.
+In order for the example above to compile, an instance of an `odelay.Timer` needs to be in implicit scope, just as an ExecutionContext would when working with Scala Futures.
 
 `odelay.Timers` define an interface for task scheduling. Implementations of `odelay.Timers` are defined for a number of environments and platforms.
 
