@@ -83,6 +83,6 @@ trait TimerSpec extends FunSpec with BeforeAndAfterAll {
   }
 
   override def afterAll() {
-    timer.stop
+    timer.stop()
   }
 }
