@@ -7,6 +7,7 @@ import io.netty.util.{
 import io.netty.util.concurrent.EventExecutorGroup
 import scala.concurrent.Promise
 import scala.concurrent.duration.FiniteDuration
+import scala.util.control.NonFatal
 import java.util.concurrent.TimeUnit
 
 class NettyGroupTimer(
@@ -16,12 +17,18 @@ class NettyGroupTimer(
 
   def apply[T](delay: FiniteDuration, op: => T): Delay[T] =
     new PromisingDelay[T] {
-      val sf = grp.schedule(new Runnable {
-        def run = completePromise(op)
-      }, delay.length, delay.unit)
+      val sf = try {
+        Some(grp.schedule(new Runnable {
+          def run = completePromise(op)
+        }, delay.length, delay.unit))
+      } catch {
+        case NonFatal(e) =>
+          failPromise(e)
+          None
+      }
 
-      def cancel() = if (!sf.isCancelled) {
-        sf.cancel(interruptOnCancel)
+      def cancel() = sf.filterNot(_.isCancelled).foreach { f =>
+        f.cancel(interruptOnCancel)
         cancelPromise()
       }
     }
@@ -30,12 +37,18 @@ class NettyGroupTimer(
     delay: FiniteDuration, every: FiniteDuration, op: => T): Delay[T] =
     new PromisingDelay[T] {
       val p = Promise[T]()
-      val sf = grp.scheduleWithFixedDelay(new Runnable {
-        def run = if (promiseIncomplete) op
-      }, delay.toUnit(every.unit).toLong, every.length, every.unit)
+      val sf = try {
+        Some(grp.scheduleWithFixedDelay(new Runnable {
+          def run = if (promiseIncomplete) op
+        }, delay.toUnit(every.unit).toLong, every.length, every.unit))
+      } catch {
+        case NonFatal(e) =>
+          failPromise(e)
+          None
+      }
 
-      def cancel() = if (!sf.isCancelled) {
-        sf.cancel(interruptOnCancel)
+      def cancel() = sf.filterNot(_.isCancelled).foreach { f =>
+        f.cancel(interruptOnCancel)
         cancelPromise()
       }
     }
@@ -48,13 +61,19 @@ class NettyTimer(underlying: NTimer = new HashedWheelTimer)
 
   def apply[T](delay: FiniteDuration, op: => T): Delay[T] =
     new PromisingDelay[T] {
-      val to = underlying.newTimeout(new TimerTask {
-        def run(timeout: Timeout) =
-          completePromise(op)
-      }, delay.length, delay.unit)
+      val to = try {
+        Some(underlying.newTimeout(new TimerTask {
+          def run(timeout: Timeout) =
+            completePromise(op)
+        }, delay.length, delay.unit))
+      } catch {
+        case NonFatal(e) =>
+          failPromise(e)
+          None
+      }
 
-      def cancel() = if (!to.isCancelled) {
-        to.cancel()
+      def cancel() = to.filterNot(_.isCancelled).foreach { f =>
+        f.cancel()
         cancelPromise()
       }
     }
@@ -63,9 +82,15 @@ class NettyTimer(underlying: NTimer = new HashedWheelTimer)
     delay: FiniteDuration, every: FiniteDuration, op: => T): Delay[T] =
     new PromisingDelay[T] {
       var nextDelay: Option[Delay[T]] = None
-      val to = underlying.newTimeout(new TimerTask {
-        def run(timeout: Timeout) = loop()
-      }, delay.length, delay.unit)
+      val to = try {
+        Some(underlying.newTimeout(new TimerTask {
+          def run(timeout: Timeout) = loop()
+        }, delay.length, delay.unit))
+      } catch {
+        case NonFatal(e) =>
+          failPromise(e)
+          None
+      }
 
       def loop() =
         if (promiseIncomplete) {
@@ -74,9 +99,9 @@ class NettyTimer(underlying: NTimer = new HashedWheelTimer)
         }
 
       def cancel() =
-        if (!to.isCancelled) {
+        to.filterNot(_.isCancelled).foreach { f =>
           synchronized {
-            to.cancel()
+            f.cancel()
             nextDelay.foreach(_.cancel())
             cancelPromise()
           }

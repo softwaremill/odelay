@@ -6,6 +6,7 @@ import org.jboss.netty.util.{
   HashedWheelTimer, Timeout, Timer => NTimer, TimerTask }
 import scala.concurrent.Promise
 import scala.concurrent.duration.FiniteDuration
+import scala.util.control.NonFatal
 import java.util.concurrent.{ ThreadFactory, TimeUnit }
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -13,12 +14,18 @@ class NettyTimer(underlying: NTimer = new HashedWheelTimer)
   extends Timer {
   def apply[T](after: FiniteDuration, op: => T): Delay[T] =
     new PromisingDelay[T] {
-      private val to = underlying.newTimeout(new TimerTask {
-        def run(timeout: Timeout) = completePromise(op)
-      }, after.length, after.unit)
+      private val to = try {
+        Some(underlying.newTimeout(new TimerTask {
+          def run(timeout: Timeout) = completePromise(op)
+        }, after.length, after.unit))
+      } catch {
+        case NonFatal(e) =>
+          failPromise(e)
+          None
+      }
 
-      def cancel() = if (!to.isCancelled) {
-        to.cancel()
+      def cancel() = to.filterNot(_.isCancelled).foreach { f =>
+        f.cancel()
         cancelPromise()
       }
     }
@@ -27,9 +34,15 @@ class NettyTimer(underlying: NTimer = new HashedWheelTimer)
     delay: FiniteDuration, every: FiniteDuration, op: => T): Delay[T] =
     new PromisingDelay[T] {
       var nextDelay: Option[Delay[T]] = None
-      val to = underlying.newTimeout(new TimerTask {
-        def run(timeout: Timeout) = loop()
-      }, delay.length, delay.unit)
+      val to = try {
+        Some(underlying.newTimeout(new TimerTask {
+          def run(timeout: Timeout) = loop()
+        }, delay.length, delay.unit))
+      } catch {
+        case NonFatal(e) =>
+          failPromise(e)
+          None
+      }
 
       def loop() =
         if (promiseIncomplete) {
@@ -38,9 +51,9 @@ class NettyTimer(underlying: NTimer = new HashedWheelTimer)
         }
 
       def cancel() =
-        if (!to.isCancelled) {
+        to.filterNot(_.isCancelled).foreach { f =>
           synchronized {
-            to.cancel()
+            f.cancel()
             nextDelay.foreach(_.cancel())
             cancelPromise()
           }

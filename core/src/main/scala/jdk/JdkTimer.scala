@@ -6,6 +6,7 @@ import scala.concurrent.duration.{ Duration, FiniteDuration }
 import java.util.concurrent.{
   RejectedExecutionHandler, ScheduledExecutorService,
   ScheduledThreadPoolExecutor, ThreadFactory }
+import scala.util.control.NonFatal
 import java.util.concurrent.atomic.AtomicInteger
 
 /** A Timer implemented in terms of a jdk ScheduledThreadPoolExecutor */
@@ -26,24 +27,36 @@ class JdkTimer(
 
   def apply[T](delay: FiniteDuration, op: => T): Delay[T] =
     new PromisingDelay[T] {
-      val jfuture = underlying.schedule(new Runnable {
-        def run() = completePromise(op)
-      }, delay.length, delay.unit)
+      val jfuture = try {
+        Some(underlying.schedule(new Runnable {
+          def run() = completePromise(op)
+        }, delay.length, delay.unit))
+      } catch {
+        case NonFatal(e) =>
+          failPromise(e)
+          None
+      }
 
-      def cancel() = if (!jfuture.isCancelled) {
-        jfuture.cancel(interruptOnCancel)
+      def cancel() = jfuture.filterNot(_.isCancelled).foreach { f =>
+        f.cancel(interruptOnCancel)
         cancelPromise()
       }
     }
 
   def apply[T](delay: FiniteDuration, every: FiniteDuration, op: => T): Delay[T] =
     new PromisingDelay[T] {
-      val jfuture = underlying.scheduleWithFixedDelay(new Runnable {
-        def run = if (promiseIncomplete) op
-      }, delay.toUnit(every.unit).toLong, every.length, every.unit)
+      val jfuture = try {
+        Some(underlying.scheduleWithFixedDelay(new Runnable {
+          def run = if (promiseIncomplete) op
+        }, delay.toUnit(every.unit).toLong, every.length, every.unit))
+      } catch {
+        case NonFatal(e) =>
+          failPromise(e)
+          None
+      }
 
-      def cancel() = if (!jfuture.isCancelled) {
-        jfuture.cancel(interruptOnCancel)
+      def cancel() = jfuture.filterNot(_.isCancelled).foreach { f =>
+        f.cancel(interruptOnCancel)
         cancelPromise()
       }
     }

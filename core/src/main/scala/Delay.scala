@@ -73,6 +73,10 @@ abstract class PromisingDelay[T] extends Delay[T] {
   protected def cancelPromise(): Unit =
     Delay.cancel(promise)
 
+  /** if it's not already completed */
+  protected def failPromise(why: Throwable): Unit =
+    if (promiseIncomplete) promise.failure(why)
+
   /** Completes the Promise with a success if the promise is not already completed */
   protected def completePromise(value: => T): Unit =
     if (promiseIncomplete) promise.success(value)

@@ -4,16 +4,24 @@ import odelay.{ Delay, PromisingDelay, Timer }
 import com.twitter.util.{ Duration, JavaTimer, Timer => TwttrTimer }
 import scala.concurrent.Promise
 import scala.concurrent.duration.FiniteDuration
+import scala.util.control.NonFatal
 
 case class TwitterTimer(underlying: TwttrTimer)
   extends Timer {
 
   def apply[T](delay: FiniteDuration, op: => T): Delay[T] =
     new PromisingDelay[T] {
-      val tto = underlying.schedule(
-        duration(delay).fromNow)(completePromise(op))
-      def cancel() {
-        tto.cancel()
+      val tto = try {
+        Some(underlying.schedule(
+          duration(delay).fromNow)(completePromise(op)))
+      } catch {
+        case NonFatal(e) =>
+          failPromise(e)
+          None
+      }
+
+      def cancel() = tto.foreach { f =>
+        f.cancel()
         cancelPromise()
       }
     }
@@ -21,11 +29,18 @@ case class TwitterTimer(underlying: TwttrTimer)
   def apply[T](
     delay: FiniteDuration, every: FiniteDuration, op: => T): Delay[T] =
     new PromisingDelay[T] {
-      val tto = underlying.schedule(
-        duration(delay).fromNow,
-        duration(every))(op)
-      def cancel() {
-        tto.cancel()
+      val tto = try {
+        Some(underlying.schedule(
+          duration(delay).fromNow,
+          duration(every))(op))
+      } catch {
+        case NonFatal(e) =>
+          failPromise(e)
+          None
+      }
+
+      def cancel() = tto.foreach { f =>
+        f.cancel()
         cancelPromise()
       }
     }
