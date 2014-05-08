@@ -68,7 +68,7 @@ To use one of these, bring the default netty timer into scope
 ```scala
 import scala.concurrent.duration._
 
-implicit val timer = odelay.netty.Default.timer
+implicit val timer = odelay.netty.Default.newTimer
 odelay.Delay(2.seconds) {
   println("executed")
 }
@@ -102,7 +102,7 @@ If your application has the [twitter util][tu] suite of utilities on its classpa
 
 ```scala
 import scala.concurrent.duration._
-implicit val timer = odelay.twitter.Default.timer
+implicit val timer = odelay.twitter.Default.newTimer
 odelay.Delay(2.seconds) {
   println("executed")
 }
@@ -112,7 +112,7 @@ You may also define your own `odelay.Timer` in terms of a `com.twitter.util.Time
 
 ```scala
 import scala.concurrent.duration._
-implicit val timer = new odelay.twitter.Timer(myTwitterTimer)
+implicit val timer = new odelay.twitter.TwitterTimer(myTwitterTimer)
 odelay.Delay(2.seconds) {
   println("executed")
 }
