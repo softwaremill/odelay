@@ -1,8 +1,14 @@
-organization := "me.lessis"
+organization in ThisBuild := "me.lessis"
 
-version := "0.1.0-SNAPSHOT"
+version in ThisBuild := "0.1.0-SNAPSHOT"
 
-crossScalaVersions := Seq("2.9.3", "2.10.4", "2.11.0")
+crossScalaVersions in ThisBuild := Seq("2.9.3", "2.10.4", "2.11.0")
+
+scalaVersion in ThisBuild := crossScalaVersions.value.last
+
+scalacOptions in ThisBuild ++= Seq(Opts.compile.deprecation)
+
+licenses in ThisBuild := Seq(("MIT", url("https://github.com/softprops/odelay/blob/${version.value}/LICENSE")))
 
 lazy val root = project.in(file("."))
   .settings(
@@ -11,10 +17,8 @@ lazy val root = project.in(file("."))
   .aggregate(core, coreTests, netty3, netty, twttr, testing)
 
 lazy val core = Common.module("core")
-  .settings(test := {})
 
 lazy val testing = Common.module("testing")
-  .settings(publish := {}, test := {})
   .dependsOn(core)
 
 lazy val coreTests = Common.module("core-tests")
