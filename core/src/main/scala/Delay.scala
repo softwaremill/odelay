@@ -4,6 +4,8 @@ import scala.concurrent.{ Future, Promise }
 import scala.concurrent.duration.{ Duration, FiniteDuration }
 import java.util.concurrent.CancellationException
 
+import scala.util.control.NonFatal
+
 /**
  * Provides an interface for producing Delays. Use
  * requires an implicit [[odelay.Timer]] to be in implicit scope.
