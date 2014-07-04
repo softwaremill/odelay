@@ -6,9 +6,12 @@ crossScalaVersions in ThisBuild := Seq("2.9.3", "2.10.4", "2.11.0")
 
 scalaVersion in ThisBuild := crossScalaVersions.value.last
 
-scalacOptions in ThisBuild ++= Seq(Opts.compile.deprecation)
+scalacOptions in ThisBuild ++= Seq(Opts.compile.deprecation) ++
+  Seq("-Ywarn-unused-import", "-Ywarn-unused", "-Xlint", "-feature").filter(
+    Function.const(scalaVersion.value.startsWith("2.11")))
 
-licenses in ThisBuild := Seq(("MIT", url("https://github.com/softprops/odelay/blob/${version.value}/LICENSE")))
+licenses in ThisBuild := Seq(
+  ("MIT", url("https://github.com/softprops/odelay/blob/${version.value}/LICENSE")))
 
 lazy val root = project.in(file("."))
   .settings(
@@ -33,3 +36,4 @@ lazy val netty = Common.module("netty")
   
 lazy val twttr = Common.module("twitter")
   .dependsOn(core, testing % "test->test")
+  .settings(crossScalaVersions := Seq("2.9.3", "2.10.4"))
