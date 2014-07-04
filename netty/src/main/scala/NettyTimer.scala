@@ -36,7 +36,6 @@ class NettyGroupTimer(
   def apply[T](
     delay: FiniteDuration, every: FiniteDuration, op: => T): Delay[T] =
     new PromisingDelay[T] {
-      val p = Promise[T]()
       val sf = try {
         Some(grp.scheduleWithFixedDelay(new Runnable {
           def run = if (promiseIncomplete) op
