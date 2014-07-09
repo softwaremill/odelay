@@ -6,7 +6,7 @@ Delayed reactions, fashioned from tools you already have sitting in your shed.
 
 ## usage
 
-Odelay provides a simple interface producing Delays. Delays are to operations as Futures are to values, for given [FiniteDurations][fd].
+Odelay provides a simple interface producing Delays. Delays are to operations as [Futures][fut] are to values, for given [FiniteDurations][fd].
 
 ### primitives
 
