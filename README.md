@@ -21,6 +21,8 @@ Typical usage is as follows.
 
 ```scala
 import scala.concurrent.duration._
+
+// print "executed" after a 2 second delay
 odelay.Delay(2.seconds) {
   println("executed")
 }
@@ -40,6 +42,8 @@ To make the example above compile, import the default `Timer`.
 
 ```scala
 import scala.concurrent.duration._
+
+// bring default timer into scope
 import odelay.Timer.default
 
 odelay.Delay(2.seconds) {
@@ -51,6 +55,8 @@ If you already have a [ScheduledExecutorService][ses] on hand, you may define yo
 
 ```scala
 import scala.concurrent.duration._
+
+// define a new JdkTimer instance with resources preallocated
 implicit val myJdkTimer = new odelay.jdk.JdkTimer(
   myScheduledExecutorService, interuptOnCancel)
  
