@@ -1,6 +1,6 @@
 package odelay.jdk
 
 class JdkTimerSpec extends odelay.testing.TimerSpec {
-  def newTimer = Default.newTimer
+  def newTimer = JdkTimer.newTimer
   def timerName = "JdkTimer"
 }

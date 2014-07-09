@@ -17,6 +17,6 @@ trait Timer {
 }
 
 /** Defines default configurations for timers */
-object Default {
-  implicit val timer: Timer = jdk.Default.newTimer
+object Timer {
+  implicit val default: Timer = jdk.JdkTimer.newTimer
 }

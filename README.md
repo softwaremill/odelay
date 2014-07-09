@@ -40,7 +40,7 @@ To make the example above compile, import the default `Timer`.
 
 ```scala
 import scala.concurrent.duration._
-import odelay.Default.timer
+import odelay.Timer.default
 
 odelay.Delay(2.seconds) {
   println("executed")
@@ -68,7 +68,7 @@ To use one of these, bring the default netty timer into scope
 ```scala
 import scala.concurrent.duration._
 
-implicit val timer = odelay.netty.Default.newTimer
+implicit val timer = odelay.netty.NettyTimer.newTimer
 odelay.Delay(2.seconds) {
   println("executed")
 }
@@ -102,7 +102,7 @@ If your application has the [twitter util][tu] suite of utilities on its classpa
 
 ```scala
 import scala.concurrent.duration._
-implicit val timer = odelay.twitter.Default.newTimer
+implicit val timer = odelay.twitter.TwitterTimer.newTimer
 odelay.Delay(2.seconds) {
   println("executed")
 }
@@ -134,7 +134,7 @@ The following example will print "executed" every two seconds until the resultin
 
 ```scala
 import scala.concurrent.duration._
-import odelay.Default.timer
+import odelay.Timer.default
 
 odelay.Delay.every(2.seconds)() {
   println("executed")
@@ -156,7 +156,7 @@ import scala.concurrent.duration._
 // future execution
 import scala.concurrent.ExecutionContext.Implicits.global
 // delay execution
-import odelay.Default.timer
+import odelay.Timer.default
 
 odelay.Delay(2.seconds) {
   println("executed")
@@ -176,7 +176,7 @@ However, a canceled periodic delay will satisfy a periodic delay's Future in a f
 ```scala
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
-import odelay.Default.timer
+import odelay.Timer.default
 
 val delay = odelay.Delay.every(2.seconds)() {
   println("executed")

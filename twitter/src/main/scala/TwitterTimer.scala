@@ -1,7 +1,7 @@
 package odelay.twitter
 
-import odelay.{ Delay, PromisingDelay, Timer }
 import com.twitter.util.{ Duration, JavaTimer, Timer => TwttrTimer }
+import odelay.{ Delay, PromisingDelay, Timer }
 import scala.concurrent.Promise
 import scala.concurrent.duration.FiniteDuration
 import scala.util.control.NonFatal
@@ -51,7 +51,7 @@ case class TwitterTimer(underlying: TwttrTimer)
     Duration.fromNanoseconds(fd.toNanos)
 }
 
-object Default {
+object TwitterTimer {
   /** Default twitter timer backed by a com.twitter.util.JavaTimer */
   def newTimer: Timer = new TwitterTimer(new JavaTimer(true))
 }

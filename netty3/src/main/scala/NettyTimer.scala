@@ -1,14 +1,14 @@
 package odelay.netty
 
+import java.util.concurrent.{ ThreadFactory, TimeUnit }
+import java.util.concurrent.atomic.AtomicInteger
 import odelay.{ Delay, PromisingDelay, Timer }
-import odelay.jdk.{ Default => JdkDefault }
+import odelay.jdk.JdkTimer
 import org.jboss.netty.util.{
   HashedWheelTimer, Timeout, Timer => NTimer, TimerTask }
 import scala.concurrent.Promise
 import scala.concurrent.duration.FiniteDuration
 import scala.util.control.NonFatal
-import java.util.concurrent.{ ThreadFactory, TimeUnit }
-import java.util.concurrent.atomic.AtomicInteger
 
 class NettyTimer(underlying: NTimer = new HashedWheelTimer)
   extends Timer {
@@ -63,9 +63,9 @@ class NettyTimer(underlying: NTimer = new HashedWheelTimer)
   def stop(): Unit = underlying.stop()
 }
 
-object Default {
+object NettyTimer {
   def newTimer: Timer = new NettyTimer(
     new HashedWheelTimer(
-      JdkDefault.threadFactory,
+      JdkTimer.threadFactory,
       10, TimeUnit.MILLISECONDS))
 }

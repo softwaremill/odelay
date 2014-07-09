@@ -13,11 +13,11 @@ scalacOptions in ThisBuild ++= Seq(Opts.compile.deprecation) ++
 licenses in ThisBuild := Seq(
   ("MIT", url("https://github.com/softprops/odelay/blob/${version.value}/LICENSE")))
 
-lazy val root = project.in(file("."))
-  .settings(
-    publish := {}, test := {}, publishLocal := {}
-  )
-  .aggregate(core, coreTests, netty3, netty, twttr, testing)
+//lazy val root = project.in(file("."))
+//  .settings(
+//    publish := {}, test := {}, publishLocal := {}
+//  )
+//  .aggregate(core, coreTests, netty3, netty, twttr, testing)
 
 lazy val core = Common.module("core")
 

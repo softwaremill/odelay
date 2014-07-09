@@ -1,13 +1,14 @@
 package odelay.jdk
 
-import odelay.{ PromisingDelay, Delay, Timer }
-import scala.concurrent.Promise
-import scala.concurrent.duration.{ Duration, FiniteDuration }
 import java.util.concurrent.{
+  Future => JFuture,
   RejectedExecutionHandler, ScheduledExecutorService,
   ScheduledThreadPoolExecutor, ThreadFactory }
-import scala.util.control.NonFatal
 import java.util.concurrent.atomic.AtomicInteger
+import odelay.{ PromisingDelay, Delay, Timer }
+import scala.concurrent.Promise
+import scala.concurrent.duration.FiniteDuration
+import scala.util.control.NonFatal
 
 /** A Timer implemented in terms of a jdk ScheduledThreadPoolExecutor */
 class JdkTimer(
@@ -17,17 +18,17 @@ class JdkTimer(
 
   /** customizing constructor */
   def this(
-    poolSize: Int = Default.poolSize,
-    threads: ThreadFactory = Default.threadFactory,
-    handler: Option[RejectedExecutionHandler] = Default.rejectionHandler,
-    interruptOnCancel: Boolean = Default.interruptOnCancel) =
+    poolSize: Int                             = JdkTimer.poolSize,
+    threads: ThreadFactory                    = JdkTimer.threadFactory,
+    handler: Option[RejectedExecutionHandler] = JdkTimer.rejectionHandler,
+    interruptOnCancel: Boolean                = JdkTimer.interruptOnCancel) =
     this(handler.map( rejections => new ScheduledThreadPoolExecutor(poolSize, threads, rejections))
                 .getOrElse(new ScheduledThreadPoolExecutor(poolSize, threads)),
          interruptOnCancel)
 
   def apply[T](delay: FiniteDuration, op: => T): Delay[T] =
     new PromisingDelay[T] {
-      val jfuture = try {
+      val jfuture: Option[JFuture[_]] = try {
         Some(underlying.schedule(new Runnable {
           def run() = completePromise(op)
         }, delay.length, delay.unit))
@@ -45,7 +46,7 @@ class JdkTimer(
 
   def apply[T](delay: FiniteDuration, every: FiniteDuration, op: => T): Delay[T] =
     new PromisingDelay[T] {
-      val jfuture = try {
+      val jfuture: Option[JFuture[_]] = try {
         Some(underlying.scheduleWithFixedDelay(new Runnable {
           def run = if (promiseIncomplete) op
         }, delay.toUnit(every.unit).toLong, every.length, every.unit))
@@ -65,8 +66,9 @@ class JdkTimer(
 }
 
 /** defaults for jdk timers */
-object Default {
+object JdkTimer {
   lazy val poolSize = Runtime.getRuntime().availableProcessors()
+  /** @return a new ThreadFactory with that produces new threads named odelay-{threadNum} */
   def threadFactory: ThreadFactory = new ThreadFactory {
     val grp = new ThreadGroup(
       Thread.currentThread().getThreadGroup(), "odelay")
@@ -78,8 +80,11 @@ object Default {
         setDaemon(true)
       }
   }
+
   val rejectionHandler: Option[RejectedExecutionHandler] = None
+
   val interruptOnCancel = true
+
   /** @return a _new_ Timer. when used clients should be sure to call stop() on all instances for a clean shutdown */
   def newTimer: Timer = new JdkTimer(
     poolSize, threadFactory, rejectionHandler, interruptOnCancel)

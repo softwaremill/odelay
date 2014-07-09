@@ -1,23 +1,23 @@
 package odelay.netty
 
-import odelay.{ Delay, PromisingDelay, Timer }
-import odelay.jdk.{ Default => JdkDefault }
 import io.netty.util.{
   HashedWheelTimer, Timeout, Timer => NTimer, TimerTask }
-import io.netty.util.concurrent.EventExecutorGroup
+import io.netty.util.concurrent.{ EventExecutorGroup, Future => NFuture }
+import odelay.{ Delay, PromisingDelay, Timer }
+import odelay.jdk.JdkTimer
+import java.util.concurrent.TimeUnit
 import scala.concurrent.Promise
 import scala.concurrent.duration.FiniteDuration
 import scala.util.control.NonFatal
-import java.util.concurrent.TimeUnit
 
 class NettyGroupTimer(
   grp: EventExecutorGroup,
-  interruptOnCancel: Boolean = Default.interruptOnCancel)
+  interruptOnCancel: Boolean = NettyTimer.interruptOnCancel)
   extends Timer {
 
   def apply[T](delay: FiniteDuration, op: => T): Delay[T] =
     new PromisingDelay[T] {
-      val sf = try {
+      val sf: Option[NFuture[_]] = try {
         Some(grp.schedule(new Runnable {
           def run = completePromise(op)
         }, delay.length, delay.unit))
@@ -36,7 +36,7 @@ class NettyGroupTimer(
   def apply[T](
     delay: FiniteDuration, every: FiniteDuration, op: => T): Delay[T] =
     new PromisingDelay[T] {
-      val sf = try {
+      val sf: Option[NFuture[_]] = try {
         Some(grp.scheduleWithFixedDelay(new Runnable {
           def run = if (promiseIncomplete) op
         }, delay.toUnit(every.unit).toLong, every.length, every.unit))
@@ -110,13 +110,15 @@ class NettyTimer(underlying: NTimer = new HashedWheelTimer)
   def stop(): Unit = underlying.stop()
 }
 
-object Default {
+object NettyTimer {
   val interruptOnCancel = true
+
   def groupTimer(grp: EventExecutorGroup) =
     new NettyGroupTimer(grp)
+
   /** @return a _new_ NettyTimer backed by a HashedWheelTimer */
   def newTimer: Timer = new NettyTimer(
     new HashedWheelTimer(
-      JdkDefault.threadFactory,
+      JdkTimer.threadFactory,
       10, TimeUnit.MILLISECONDS))
 }
