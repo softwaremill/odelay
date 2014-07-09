@@ -128,7 +128,7 @@ odelay.Delay(2.seconds) {
 
 `odelay.Timers` use thread resources to do their work. In order for a jvm to be shutdown cleanly, these thread resources need to be released.
 Depending on your applications needs, you should really only need _one_ instance of an `odelay.Timer`.
-When an application terminates, it should ensure be instrumented in a way that the `stop()` method of that `odelay.Timer` is invoked in ensure those thread resources are released so your application can shutdown cleanly. Calling `stop()` on a Timer will most likely result failed promises, if
+When an application terminates, it should ensure be instrumented in a way that the `stop()` method of that `odelay.Timer` is invoked in ensure those thread resources are released so your application can shutdown cleanly. Calling `stop()` on a Timer will most likely result failed promises if
 a new Delay is attempted with the stopped timer.
 
 ### Periodic delays
