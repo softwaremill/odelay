@@ -19,21 +19,29 @@ licenses in ThisBuild := Seq(
 //  )
 //  .aggregate(core, coreTests, netty3, netty, twttr, testing)
 
-lazy val core = Common.module("core")
+val commonSettings = bintraySettings
 
-lazy val testing = Common.module("testing")
-  .dependsOn(core)
+lazy val `odelay-core` =
+  project
 
-lazy val coreTests = Common.module("core-tests")
-  .settings(publish := {})
-  .dependsOn(testing % "test->test;compile->compile")
+lazy val `odelay-testing` =
+  project.dependsOn(`odelay-core`)
+         .settings(commonSettings:_*)
+
+lazy val `odelay-core-tests` =
+  project.settings(publish := {})
+         .dependsOn(`odelay-testing` % "test->test;compile->compile")
+         .settings(commonSettings:_*)
  
-lazy val netty3 = Common.module("netty3")
-  .dependsOn(core, testing % "test->test")
+lazy val `odelay-netty3` =
+  project.dependsOn(`odelay-core`, `odelay-testing` % "test->test")
+         .settings(commonSettings:_*)
 
-lazy val netty = Common.module("netty")
-  .dependsOn(core, testing % "test->test")
+lazy val `odelay-netty` =
+  project.dependsOn(`odelay-core`, `odelay-testing` % "test->test")
+         .settings(commonSettings:_*)
   
-lazy val twttr = Common.module("twitter")
-  .dependsOn(core, testing % "test->test")
-  .settings(crossScalaVersions := Seq("2.9.3", "2.10.4"))
+lazy val `odelay-twitter` =
+  project.dependsOn(`odelay-core`, `odelay-testing` % "test->test")
+         .settings(Seq(crossScalaVersions := Seq("2.9.3", "2.10.4"))
+                   ++ commonSettings:_*)
