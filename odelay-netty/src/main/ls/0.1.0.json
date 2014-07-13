@@ -1,0 +1,21 @@
+{
+  "organization" : "me.lessis",
+  "name" : "odelay-netty",
+  "version" : "0.1.0-SNAPSHOT",
+  "description" : "odelay-netty",
+  "site" : "",
+  "tags" : [ "email", "mail", "javamail" ],
+  "docs" : "",
+  "resolvers" : [ "http://dl.bintray.com/content/softprops/maven" ],
+  "dependencies" : [ {
+    "organization" : "io.netty",
+    "name" : "netty-common",
+    "version" : "4.0.21.Final"
+  } ],
+  "scalas" : [ "2.9.3", "2.10.4", "2.11.1" ],
+  "licenses" : [ {
+    "name" : "MIT",
+    "url" : "https://github.com/softprops/odelay/blob/${version.value}/LICENSE"
+  } ],
+  "sbt" : false
+}

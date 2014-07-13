@@ -18,7 +18,11 @@ licenses in ThisBuild := Seq(
 // https://github.com/sbt/sbt/blob/c5d0c4cd29621c64532b4bce5150ef3b2e2b86e7/main/src/main/scala/sbt/Build.scala#L60
 // https://github.com/sbt/sbt/blob/c5d0c4cd29621c64532b4bce5150ef3b2e2b86e7/main/src/main/scala/sbt/Build.scala#L48
 
-val commonSettings = bintraySettings
+val commonSettings = bintraySettings ++ lsSettings ++ Seq(
+ bintray.Keys.packageLabels in bintray.Keys.bintray := Seq("delay", "scheduling", "future"),
+ LsKeys.tags in LsKeys.lsync := (bintray.Keys.packageLabels in bintray.Keys.bintray).value,
+ externalResolvers in LsKeys.lsync := (resolvers in bintray.Keys.bintray).value
+)
 
 lazy val `odelay-core` =
   project
@@ -43,3 +47,16 @@ lazy val `odelay-netty` =
 lazy val `odelay-twitter` =
   project.dependsOn(`odelay-core`, `odelay-testing` % "test->test")
          .settings(commonSettings:_*)
+
+pomExtra := (
+  <scm>
+    <url>git@github.com:softprops/odelay.git</url>
+    <connection>scm:git:git@github.com:softprops/odelay.git</connection>
+  </scm>
+  <developers>
+    <developer>
+      <id>softprops</id>
+      <name>Doug Tangren</name>
+      <url>https://github.com/softprops</url>
+    </developer>
+  </developers>)

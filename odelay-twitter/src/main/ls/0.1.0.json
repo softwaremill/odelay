@@ -1,0 +1,21 @@
+{
+  "organization" : "me.lessis",
+  "name" : "odelay-twitter",
+  "version" : "0.1.0-SNAPSHOT",
+  "description" : "an odelay.Timer implementation backed by a com.twitter.util.Timer",
+  "site" : "",
+  "tags" : [ "email", "mail", "javamail" ],
+  "docs" : "",
+  "resolvers" : [ "http://dl.bintray.com/content/softprops/maven" ],
+  "dependencies" : [ {
+    "organization" : "com.twitter",
+    "name" : "util-core",
+    "version" : "6.18.0"
+  } ],
+  "scalas" : [ "2.9.3", "2.10.4" ],
+  "licenses" : [ {
+    "name" : "MIT",
+    "url" : "https://github.com/softprops/odelay/blob/${version.value}/LICENSE"
+  } ],
+  "sbt" : false
+}

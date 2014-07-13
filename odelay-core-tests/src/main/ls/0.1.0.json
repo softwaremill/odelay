@@ -1,0 +1,17 @@
+{
+  "organization" : "me.lessis",
+  "name" : "odelay-core-tests",
+  "version" : "0.1.0-SNAPSHOT",
+  "description" : "odelay-core-tests",
+  "site" : "",
+  "tags" : [ "email", "mail", "javamail" ],
+  "docs" : "",
+  "resolvers" : [ "http://dl.bintray.com/content/softprops/maven" ],
+  "dependencies" : [ ],
+  "scalas" : [ "2.9.3", "2.10.4", "2.11.1" ],
+  "licenses" : [ {
+    "name" : "MIT",
+    "url" : "https://github.com/softprops/odelay/blob/${version.value}/LICENSE"
+  } ],
+  "sbt" : false
+}
