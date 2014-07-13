@@ -1,8 +1,8 @@
 {
   "organization" : "me.lessis",
-  "name" : "odelay-core-tests",
+  "name" : "odelay-core",
   "version" : "0.1.0-SNAPSHOT",
-  "description" : "odelay-core-tests",
+  "description" : "provides primatives for delaying execution of operations",
   "site" : "",
   "tags" : [ "delay", "scheduling", "future" ],
   "docs" : "",

@@ -25,7 +25,7 @@ val commonSettings = bintraySettings ++ lsSettings ++ Seq(
 )
 
 lazy val `odelay-core` =
-  project
+  project.settings(commonSettings:_*)
 
 lazy val `odelay-testing` =
   project.dependsOn(`odelay-core`)

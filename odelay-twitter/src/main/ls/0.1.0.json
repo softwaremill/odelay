@@ -4,7 +4,7 @@
   "version" : "0.1.0-SNAPSHOT",
   "description" : "an odelay.Timer implementation backed by a com.twitter.util.Timer",
   "site" : "",
-  "tags" : [ "email", "mail", "javamail" ],
+  "tags" : [ "delay", "scheduling", "future" ],
   "docs" : "",
   "resolvers" : [ "http://dl.bintray.com/content/softprops/maven" ],
   "dependencies" : [ {

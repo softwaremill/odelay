@@ -4,7 +4,7 @@
   "version" : "0.1.0-SNAPSHOT",
   "description" : "odelay-testing",
   "site" : "",
-  "tags" : [ "email", "mail", "javamail" ],
+  "tags" : [ "delay", "scheduling", "future" ],
   "docs" : "",
   "resolvers" : [ "http://dl.bintray.com/content/softprops/maven" ],
   "dependencies" : [ {
