@@ -42,5 +42,4 @@ lazy val `odelay-netty` =
   
 lazy val `odelay-twitter` =
   project.dependsOn(`odelay-core`, `odelay-testing` % "test->test")
-         .settings(Seq(crossScalaVersions := Seq("2.9.3", "2.10.4"))
-                   ++ commonSettings:_*)
+         .settings(commonSettings:_*)
