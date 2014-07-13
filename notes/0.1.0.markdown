@@ -1,0 +1,39 @@
+## initial release
+
+Scala [Futures](http://www.scala-lang.org/api/current/index.html#scala.concurrent.Future) are composable primitives for composing behavior over defered values. Odelay defines a set of primatives for composing behavior over operations delayed for [FiniteDurations](http://www.scala-lang.org/api/current/index.html#scala.concurrent.duration.FiniteDuration).
+
+### typical usage
+
+    import scala.concurrent.ExecutionContext.Implicits.global
+    import scala.concurrent.durations._
+    import odelay.Timer.default
+    
+    // declare a delay
+    val delay = odelay.Delay(5.seconds) {
+      myDelayedOperation
+    }
+    
+Delays define a future interface for projecting on the scheduling of an operation.
+    
+    // project on a delay's success
+    delay.future.onSuccess {
+      case result => println("operation was scheduled")
+    }
+
+Unlike scala Futures, Delays may explicitly be cancelled. A Delay may also project on a cancelation state by reacting to its 
+future's failure state.
+    
+    // project on a delay's cancellation
+    delay.future.onFailure {
+      case _ => println("operaton was cancelled")
+    }
+
+    delay.cancel()
+    
+ ### Timers
+ 
+ Odelay defines a Timer interface responsible for delay scheduling. Timer's are defined for various backends: Jdk ScheduledExecutorSerivces,
+ Netty HashWheeledTimers, and Twitter-util's timer's. A jdk Timer is used by default. Swap in a runtime specific module to use Netty{3,4} or 
+ Twitter Timers.
+ 
+ See the projects [readme](https://github.com/softprops/odelay#odelay) for more examples.
