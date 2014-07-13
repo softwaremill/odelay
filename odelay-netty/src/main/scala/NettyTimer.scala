@@ -6,7 +6,6 @@ import io.netty.util.concurrent.{ EventExecutorGroup, Future => NFuture }
 import odelay.{ Delay, PromisingDelay, Timer }
 import odelay.jdk.JdkTimer
 import java.util.concurrent.TimeUnit
-import scala.concurrent.Promise
 import scala.concurrent.duration.FiniteDuration
 import scala.util.control.NonFatal
 

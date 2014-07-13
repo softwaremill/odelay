@@ -6,7 +6,6 @@ import odelay.{ Delay, PromisingDelay, Timer }
 import odelay.jdk.JdkTimer
 import org.jboss.netty.util.{
   HashedWheelTimer, Timeout, Timer => NTimer, TimerTask }
-import scala.concurrent.Promise
 import scala.concurrent.duration.FiniteDuration
 import scala.util.control.NonFatal
 
