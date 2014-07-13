@@ -5,7 +5,7 @@ Scala [Futures](http://www.scala-lang.org/api/current/index.html#scala.concurren
 ### typical usage
 
     import scala.concurrent.ExecutionContext.Implicits.global
-    import scala.concurrent.durations._
+    import scala.concurrent.duration._
     import odelay.Timer.default
     
     // declare a delay
