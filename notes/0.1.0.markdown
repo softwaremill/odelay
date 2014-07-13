@@ -29,11 +29,15 @@ future's failure state.
     }
 
     delay.cancel()
-    
+ 
+ See the project's [readme](https://github.com/softprops/odelay#odelay) for more examples.
+ 
  ### Timers
  
  Odelay defines a Timer interface responsible for delay scheduling. Timer's are defined for various backends: Jdk ScheduledExecutorSerivces,
  Netty HashWheeledTimers, and Twitter-util's timer's. A jdk Timer is used by default. Swap in a runtime specific module to use Netty{3,4} or 
  Twitter Timers.
  
- See the projects [readme](https://github.com/softprops/odelay#odelay) for more examples.
+ See the project's [readme](https://github.com/softprops/odelay#timers) for a more in-depth overview of Timers
+ 
+ 
