@@ -1,7 +1,7 @@
 {
   "organization" : "me.lessis",
   "name" : "odelay-twitter",
-  "version" : "0.1.0-SNAPSHOT",
+  "version" : "0.1.0",
   "description" : "an odelay.Timer implementation backed by a com.twitter.util.Timer",
   "site" : "",
   "tags" : [ "delay", "scheduling", "future" ],
