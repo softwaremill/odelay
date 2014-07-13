@@ -1,6 +1,6 @@
 ## initial release
 
-Scala [Futures](http://www.scala-lang.org/api/current/index.html#scala.concurrent.Future) are composable primitives for composing behavior over defered values. Odelay defines a set of primatives for composing behavior over operations delayed for [FiniteDurations](http://www.scala-lang.org/api/current/index.html#scala.concurrent.duration.FiniteDuration).
+Scala [Futures](http://www.scala-lang.org/api/current/index.html#scala.concurrent.Future) are primitives for composing behavior over defered values. Odelay defines a set of primatives for composing behavior over operations delayed for [FiniteDurations](http://www.scala-lang.org/api/current/index.html#scala.concurrent.duration.FiniteDuration).
 
 ### typical usage
 
