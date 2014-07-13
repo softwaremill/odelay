@@ -1,6 +1,6 @@
 organization in ThisBuild := "me.lessis"
 
-version in ThisBuild := "0.1.0-SNAPSHOT"
+version in ThisBuild := "0.1.0"
 
 crossScalaVersions in ThisBuild := Seq("2.9.3", "2.10.4", "2.11.1")
 
