@@ -172,7 +172,7 @@ odelay.Delay.every(2.seconds)() {
 
 ### Delays
 
-Like [Futures][fut], which provide a interface for _reacting_ to changes of a defered value, odelay operations produce `odelay.Delay` values, which can be used to _react_ to timer operations.
+Like [Futures][fut], which provide a interface for _reacting_ to changes of a deferred value, odelay operations produce `odelay.Delay` values, which can be used to _react_ to timer operations.
 
 Since Delays represent deferred operations, `odelay.Delays` expose a `future` method which returns a `Future` that will be satisfied as a success with the return type of block supplied to `odelay.Delay` when the operation is scheduled. 
 
