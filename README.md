@@ -4,6 +4,20 @@
 
 Delayed reactions, fashioned from tools you already have sitting around your shed.
 
+## installation
+
+The current version of odelay is `0.1.0` and targets scala 2.10+. The odelay-twitter module is not published for 2.11.*.
+
+### modules
+
+* `odelay-core` odelay core interfaces and default jdk backed timer
+
+* `odelay-netty` netty 4 backed odelay timer interface
+
+* `odelay-netty3` netty 3 backed odelay timer interface
+
+* `odelay-twitter` twitter util backed odelay timer interface
+
 ## usage
 
 Odelay provides a simple interface producing Delays. Delays are to operations as [Futures][fut] are to values, for given [FiniteDurations][fd].
