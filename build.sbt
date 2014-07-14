@@ -29,8 +29,7 @@ lazy val `odelay-testing` =
          .settings(unpublished:_*)
 
 lazy val `odelay-core-tests` =
-  project.settings(publish := {})
-         .dependsOn(`odelay-testing` % "test->test;compile->compile")
+  project.dependsOn(`odelay-testing` % "test->test;compile->compile")
          .settings(unpublished:_*)
  
 lazy val `odelay-netty3` =
