@@ -11,7 +11,7 @@ scalacOptions in ThisBuild ++= Seq(Opts.compile.deprecation) ++
     Function.const(scalaVersion.value.startsWith("2.11")))
 
 licenses in ThisBuild := Seq(
-  ("MIT", url("https://github.com/softprops/odelay/blob/${version.value}/LICENSE")))
+  ("MIT", url(s"https://github.com/softprops/odelay/blob/${version.value}/LICENSE")))
 
 val commonSettings = bintraySettings ++ lsSettings ++ Seq(
  bintray.Keys.packageLabels in bintray.Keys.bintray := Seq("delay", "scheduling", "future"),
