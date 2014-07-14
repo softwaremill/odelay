@@ -8,15 +8,37 @@ Delayed reactions, fashioned from tools you already have sitting around your she
 
 The current version of odelay is `0.1.0` and targets scala 2.10+. The odelay-twitter module is not published for 2.11.*.
 
+Add the following resolver to your build definition
+
+```scala
+resolvers += "softprops-maven" at "http://dl.bintray.com/content/softprops/maven"
+```
+
 ### modules
 
 * `odelay-core` odelay core interfaces and default jdk backed timer
 
+```scala
+libraryDependencies += "me.lessis" %% "odelay-core" % "0.1.0"
+```
+
 * `odelay-netty` netty 4 backed odelay timer interface
+
+```scala
+libraryDependencies += "me.lessis" %% "odelay-netty" % "0.1.0"
+```
 
 * `odelay-netty3` netty 3 backed odelay timer interface
 
+```scala
+libraryDependencies += "me.lessis" %% "odelay-netty3" % "0.1.0"
+```
+
 * `odelay-twitter` twitter util backed odelay timer interface
+
+```scala
+libraryDependencies += "me.lessis" %% "odelay-twitter" % "0.1.0"
+```
 
 ## usage
 

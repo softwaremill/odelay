@@ -2,7 +2,7 @@
   "organization" : "me.lessis",
   "name" : "odelay-netty3",
   "version" : "0.1.0",
-  "description" : "odelay-netty3",
+  "description" : "an odelay.Timer implementation backed by netty 3",
   "site" : "",
   "tags" : [ "delay", "scheduling", "future" ],
   "docs" : "",

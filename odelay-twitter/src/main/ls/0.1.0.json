@@ -12,7 +12,7 @@
     "name" : "util-core",
     "version" : "6.18.0"
   } ],
-  "scalas" : [ "2.9.3", "2.10.4" ],
+  "scalas" : [ "2.10.4" ],
   "licenses" : [ {
     "name" : "MIT",
     "url" : "https://github.com/softprops/odelay/blob/0.1.0/LICENSE"

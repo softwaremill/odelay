@@ -7,4 +7,6 @@ libraryDependencies <+= (scalaVersion) {
 
 description := "an odelay.Timer implementation backed by a com.twitter.util.Timer"
 
-crossScalaVersions := Seq("2.9.3", "2.10.4")
+crossScalaVersions := Seq("2.10.4")
+
+scalaVersion := crossScalaVersions.value.last
