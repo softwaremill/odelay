@@ -24,17 +24,19 @@ val commonSettings = bintraySettings ++ lsSettings ++ Seq(
  externalResolvers in LsKeys.lsync := (resolvers in bintray.Keys.bintray).value
 )
 
+val unpublished = Seq(publish := {}, test := {})
+
 lazy val `odelay-core` =
   project.settings(commonSettings:_*)
 
 lazy val `odelay-testing` =
   project.dependsOn(`odelay-core`)
-         .settings(commonSettings:_*)
+         .settings(unpublished:_*)
 
 lazy val `odelay-core-tests` =
   project.settings(publish := {})
          .dependsOn(`odelay-testing` % "test->test;compile->compile")
-         .settings(commonSettings:_*)
+         .settings(unpublished:_*)
  
 lazy val `odelay-netty3` =
   project.dependsOn(`odelay-core`, `odelay-testing` % "test->test")
