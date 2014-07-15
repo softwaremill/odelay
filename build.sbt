@@ -44,7 +44,7 @@ lazy val `odelay-twitter` =
   project.dependsOn(`odelay-core`, `odelay-testing` % "test->test")
          .settings(commonSettings:_*)
 
-pomExtra := (
+pomExtra in ThisBuild := (
   <scm>
     <url>git@github.com:softprops/odelay.git</url>
     <connection>scm:git:git@github.com:softprops/odelay.git</connection>
