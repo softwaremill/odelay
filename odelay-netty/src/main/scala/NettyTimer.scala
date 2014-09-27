@@ -3,7 +3,7 @@ package odelay.netty
 import io.netty.util.{
   HashedWheelTimer, Timeout, Timer => NTimer, TimerTask }
 import io.netty.util.concurrent.{ EventExecutorGroup, Future => NFuture }
-import odelay.{ Delay, PromisingDelay, Timer }
+import odelay.{ Delay, PeriodicDelay, PeriodicPromisingDelay, PromisingDelay, Timer }
 import odelay.jdk.JdkTimer
 import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.FiniteDuration
@@ -33,8 +33,8 @@ class NettyGroupTimer(
     }
 
   def apply[T](
-    delay: FiniteDuration, every: FiniteDuration, op: => T): Delay[T] =
-    new PromisingDelay[T] {
+    delay: FiniteDuration, every: FiniteDuration, op: => T): PeriodicDelay[T] =
+    new PeriodicPromisingDelay[T](every) {
       val sf: Option[NFuture[_]] = try {
         Some(grp.scheduleWithFixedDelay(new Runnable {
           def run = if (promiseIncomplete) op
@@ -77,8 +77,8 @@ class NettyTimer(underlying: NTimer = new HashedWheelTimer)
     }
 
   def apply[T](
-    delay: FiniteDuration, every: FiniteDuration, op: => T): Delay[T] =
-    new PromisingDelay[T] {
+    delay: FiniteDuration, every: FiniteDuration, op: => T): PeriodicDelay[T] =
+    new PeriodicPromisingDelay[T](every) {
       var nextDelay: Option[Delay[T]] = None
       val to = try {
         Some(underlying.newTimeout(new TimerTask {
