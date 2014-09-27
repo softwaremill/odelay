@@ -1,6 +1,6 @@
 package odelay
 
-import scala.concurrent.{ Future, Promise }
+import scala.concurrent.{ ExecutionContext, Future, Promise }
 import scala.concurrent.duration.{ Duration, FiniteDuration }
 import java.util.concurrent.CancellationException
 
@@ -36,7 +36,7 @@ object Delay {
 }
 
 /** A Delay is the default of a deferred operation */
-trait Delay[T] {
+trait Delay[T] extends MonadicDelay[T] {
   /** @return a Future represent the execution of the Delays operation. Delays
    *          to be repeated expose a future that will never complete until cancelled */
   def future: Future[T]
@@ -45,6 +45,30 @@ trait Delay[T] {
    *  is canceled, if additional attempts to cancel will result in undefined
    *  behavior */
   def cancel(): Unit
+}
+
+/** Adds `monadic` interfaces to play well for Scala for comprehensions */
+trait MonadicDelay[T] { self: Delay[T] =>
+  def foreach[U](f: T => U)(implicit ec: ExecutionContext): Unit =
+    self.future.onComplete(_.foreach(f))
+
+  def map[TT](f: T => TT)(implicit ec: ExecutionContext): Delay[TT] = new Delay[TT] {
+    def cancel() = self.cancel()
+    def future: Future[TT] = self.future.map(f)
+  }
+
+  def flatMap[TT](f: T => Delay[TT])(implicit ec: ExecutionContext): Delay[TT] = new Delay[TT] {
+    def cancel() = self.cancel()
+    def future: Future[TT] = self.future.flatMap(f(_).future)
+  }
+
+  def filter(p: T => Boolean)(implicit ec: ExecutionContext): Delay[T] = new Delay[T] {
+    def cancel() = self.cancel()
+    def future: Future[T] = self.future.filter(p)
+  }
+
+  def withFilter(p: T => Boolean)(implicit ec: ExecutionContext): Delay[T] =
+    filter(p)(ec)
 }
 
 /** If calling cancel on a Delay's implemention has no other effect

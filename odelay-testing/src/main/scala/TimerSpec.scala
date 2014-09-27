@@ -80,6 +80,36 @@ trait TimerSpec extends FunSpec with BeforeAndAfterAll {
       Thread.sleep(100)
       assert(counter.get() === 1)
     }
+
+    it ("should work with for comprehensions") {
+      val delayA = Delay(1.second) {
+        "a"
+      }
+
+      val delayB = for {
+        a <- delayA
+      } yield a * 2
+
+      val delayC = for {
+        a <- delayA
+        b <- delayB
+      } yield a + b
+
+      val delayD = for {
+        c <- delayC
+        if c == "aaa"
+      } yield "d"
+
+      val delayE = for {
+        c <- delayC
+        if c != "aaa"
+      } yield "e"
+
+      assert(Await.result(delayB.future, 1.second) === "aa")
+      assert(Await.result(delayC.future, 1.second) === "aaa")
+      assert(Await.result(delayD.future, 1.second) === "d")
+      assert(Await.result(delayE.future, 1.second) === "e")
+    }
   }
 
   override def afterAll() {
