@@ -5,7 +5,7 @@ import java.util.concurrent.{
   RejectedExecutionHandler, ScheduledExecutorService,
   ScheduledThreadPoolExecutor, ThreadFactory }
 import java.util.concurrent.atomic.AtomicInteger
-import odelay.{ PromisingDelay, Delay, Timer }
+import odelay.{ Delay, PeriodicDelay, PeriodicPromisingDelay, PromisingDelay, Timer }
 import scala.concurrent.Promise
 import scala.concurrent.duration.FiniteDuration
 import scala.util.control.NonFatal
@@ -44,8 +44,8 @@ class JdkTimer(
       }
     }
 
-  def apply[T](delay: FiniteDuration, every: FiniteDuration, op: => T): Delay[T] =
-    new PromisingDelay[T] {
+  def apply[T](delay: FiniteDuration, every: FiniteDuration, op: => T): PeriodicDelay[T] =
+    new PeriodicPromisingDelay[T](every) {
       val jfuture: Option[JFuture[_]] = try {
         Some(underlying.scheduleWithFixedDelay(new Runnable {
           def run = if (promiseIncomplete) op

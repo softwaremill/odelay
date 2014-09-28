@@ -28,7 +28,7 @@ object Delay {
     (every: FiniteDuration)
     (delay: FiniteDuration = Duration.Zero)
     (todo: => T)
-    (implicit timer: Timer): Delay[T] =
+    (implicit timer: Timer): PeriodicDelay[T] =
      timer(delay, every, todo)
 
   private [odelay] def cancel[T](p: Promise[T]) =
@@ -45,6 +45,10 @@ trait Delay[T] {
    *  is canceled, if additional attempts to cancel will result in undefined
    *  behavior */
   def cancel(): Unit
+}
+
+trait PeriodicDelay[T] extends Delay[T] {
+  def period: FiniteDuration
 }
 
 /** If calling cancel on a Delay's implemention has no other effect
@@ -66,7 +70,7 @@ trait SelfCancelation[T] { self: PromisingDelay[T] =>
  * A building block for writing your own [[odelay.Timer]].
  * Call `completePromise(_)` with the value of the result
  * of the operation. Call `cancelPromise()` to cancel it.
- * To query the current state of the promise, use `compomiseIncomplete`
+ * To query the current state of the promise, use `promiseIncomplete`
  */
 abstract class PromisingDelay[T] extends Delay[T] {
   private val promise = Promise[T]()
@@ -90,3 +94,5 @@ abstract class PromisingDelay[T] extends Delay[T] {
   /** @return a Future view of the timeouts Promise */
   def future: Future[T] = promise.future
 }
+
+abstract class PeriodicPromisingDelay[T](val period: FiniteDuration) extends PromisingDelay[T] with PeriodicDelay[T]

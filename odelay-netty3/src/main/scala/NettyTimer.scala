@@ -2,7 +2,7 @@ package odelay.netty
 
 import java.util.concurrent.{ ThreadFactory, TimeUnit }
 import java.util.concurrent.atomic.AtomicInteger
-import odelay.{ Delay, PromisingDelay, Timer }
+import odelay.{ Delay, PeriodicDelay, PeriodicPromisingDelay, PromisingDelay, Timer }
 import odelay.jdk.JdkTimer
 import org.jboss.netty.util.{
   HashedWheelTimer, Timeout, Timer => NTimer, TimerTask }
@@ -30,8 +30,8 @@ class NettyTimer(underlying: NTimer = new HashedWheelTimer)
     }
 
   def apply[T](
-    delay: FiniteDuration, every: FiniteDuration, op: => T): Delay[T] =
-    new PromisingDelay[T] {
+    delay: FiniteDuration, every: FiniteDuration, op: => T): PeriodicDelay[T] =
+    new PeriodicPromisingDelay[T](every) {
       var nextDelay: Option[Delay[T]] = None
       val to = try {
         Some(underlying.newTimeout(new TimerTask {
