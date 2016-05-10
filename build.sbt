@@ -1,6 +1,8 @@
+import BintrayPlugin.autoImport._
+
 organization in ThisBuild := "me.lessis"
 
-version in ThisBuild := "0.1.0"
+version in ThisBuild := "0.1.1"
 
 crossScalaVersions in ThisBuild := Seq("2.10.4", "2.11.1")
 
@@ -13,10 +15,13 @@ scalacOptions in ThisBuild ++= Seq(Opts.compile.deprecation) ++
 licenses in ThisBuild := Seq(
   ("MIT", url(s"https://github.com/softprops/odelay/blob/${version.value}/LICENSE")))
 
-val commonSettings = bintraySettings ++ lsSettings ++ Seq(
- bintray.Keys.packageLabels in bintray.Keys.bintray := Seq("delay", "scheduling", "future"),
- LsKeys.tags in LsKeys.lsync := (bintray.Keys.packageLabels in bintray.Keys.bintray).value,
- externalResolvers in LsKeys.lsync := (resolvers in bintray.Keys.bintray).value
+homepage in ThisBuild := Some(url(s"https://github.com/softprops/${name.value}/"))
+
+val commonSettings =  lsSettings ++ Seq(
+  LsKeys.tags in LsKeys.lsync := Seq("delay", "scheduling", "future"),
+  bintrayPackageLabels := (LsKeys.tags in LsKeys.lsync).value,
+  resolvers += sbt.Resolver.bintrayRepo("softprops","maven"),
+  externalResolvers in LsKeys.lsync := (resolvers in bintray).value
 )
 
 val unpublished = Seq(publish := {}, publishLocal := {})
@@ -29,9 +34,9 @@ lazy val `odelay-testing` =
          .settings(unpublished:_*)
 
 lazy val `odelay-core-tests` =
-  project.dependsOn(`odelay-testing` % "test->test;compile->compile")
+  project.dependsOn(`odelay-testing` % "test->test")
          .settings(unpublished:_*)
- 
+
 lazy val `odelay-netty3` =
   project.dependsOn(`odelay-core`, `odelay-testing` % "test->test")
          .settings(commonSettings:_*)
@@ -39,7 +44,7 @@ lazy val `odelay-netty3` =
 lazy val `odelay-netty` =
   project.dependsOn(`odelay-core`, `odelay-testing` % "test->test")
          .settings(commonSettings:_*)
-  
+
 lazy val `odelay-twitter` =
   project.dependsOn(`odelay-core`, `odelay-testing` % "test->test")
          .settings(commonSettings:_*)
