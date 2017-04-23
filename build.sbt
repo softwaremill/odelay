@@ -25,11 +25,11 @@ val commonSettings =  lsSettings ++ Seq(
 
 val unpublished = Seq(publish := {}, publishLocal := {})
 
-lazy val odelaycore = (crossProject in file("odelay-core")).
+lazy val `odelay-core` = (crossProject in file("odelay-core")).
   settings(commonSettings:_*)
 
-lazy val `odelay-core-js` = odelaycore.js//.settings(name := "odelay-core-js")
-lazy val `odelay-core` = odelaycore.jvm//.settings(name := "odelay-core")
+lazy val `odelay-core-js` = `odelay-core`.js
+lazy val `odelay-core-jvm` = `odelay-core`.jvm
 
 lazy val odelaytesting = (crossProject in file("odelay-testing"))
   .settings(unpublished:_*)
@@ -41,7 +41,7 @@ lazy val `odelay-testing-js` =
 
 lazy val `odelay-testing` =
   odelaytesting.jvm
-    .dependsOn(`odelay-core`)
+    .dependsOn(`odelay-core-jvm`)
     .settings(libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test")
 
 lazy val `odelay-core-tests` =
@@ -49,15 +49,15 @@ lazy val `odelay-core-tests` =
          .settings(unpublished:_*)
 
 lazy val `odelay-netty3` =
-  project.dependsOn(`odelay-core`, `odelay-testing` % "test->test")
+  project.dependsOn(`odelay-core-jvm`, `odelay-testing` % "test->test")
          .settings(commonSettings:_*)
 
 lazy val `odelay-netty` =
-  project.dependsOn(`odelay-core`, `odelay-testing` % "test->test")
+  project.dependsOn(`odelay-core-jvm`, `odelay-testing` % "test->test")
          .settings(commonSettings:_*)
 
 lazy val `odelay-twitter` =
-  project.dependsOn(`odelay-core`, `odelay-testing` % "test->test")
+  project.dependsOn(`odelay-core-jvm`, `odelay-testing` % "test->test")
     .settings(commonSettings:_*)
 
 pomExtra in ThisBuild := (
