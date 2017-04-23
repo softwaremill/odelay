@@ -4,8 +4,7 @@ organization in ThisBuild := "me.lessis"
 
 version in ThisBuild := "0.1.1"
 
-crossScalaVersions in ThisBuild := Seq("2.10.4", "2.11.1")
-
+crossScalaVersions in ThisBuild := Seq("2.10.4", "2.11.1", "2.12.1")
 scalaVersion in ThisBuild := crossScalaVersions.value.last
 
 scalacOptions in ThisBuild ++= Seq(Opts.compile.deprecation) ++
@@ -26,12 +25,24 @@ val commonSettings =  lsSettings ++ Seq(
 
 val unpublished = Seq(publish := {}, publishLocal := {})
 
-lazy val `odelay-core` =
-  project.settings(commonSettings:_*)
+lazy val odelaycore = (crossProject in file("odelay-core")).
+  settings(commonSettings:_*)
+
+lazy val `odelay-core-js` = odelaycore.js//.settings(name := "odelay-core-js")
+lazy val `odelay-core` = odelaycore.jvm//.settings(name := "odelay-core")
+
+lazy val odelaytesting = (crossProject in file("odelay-testing"))
+  .settings(unpublished:_*)
+
+lazy val `odelay-testing-js` =
+  odelaytesting.js
+    .dependsOn(`odelay-core-js`)
+    .settings(libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.1" % "test")
 
 lazy val `odelay-testing` =
-  project.dependsOn(`odelay-core`)
-         .settings(unpublished:_*)
+  odelaytesting.jvm
+    .dependsOn(`odelay-core`)
+    .settings(libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test")
 
 lazy val `odelay-core-tests` =
   project.dependsOn(`odelay-testing` % "test->test")
@@ -47,7 +58,7 @@ lazy val `odelay-netty` =
 
 lazy val `odelay-twitter` =
   project.dependsOn(`odelay-core`, `odelay-testing` % "test->test")
-         .settings(commonSettings:_*)
+    .settings(commonSettings:_*)
 
 pomExtra in ThisBuild := (
   <scm>
