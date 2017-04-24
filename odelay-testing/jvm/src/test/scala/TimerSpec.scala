@@ -69,8 +69,8 @@ trait TimerSpec extends AsyncFunSpec with BeforeAndAfterAll {
       val cancelFut = cancel.future.recoverWith {
         case e: CancellationException =>
           counter.incrementAndGet()
-          Future.unit
-        case _ => Future.unit
+          Future.successful(true)
+        case _ => Future.successful(true)
       }
       val fut = Delay(2.seconds) {
         cancel.cancel()
