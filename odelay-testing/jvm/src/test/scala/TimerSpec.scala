@@ -1,16 +1,17 @@
 package odelay.testing
 
 import odelay.{ Delay, Timer }
-import org.scalatest.{ BeforeAndAfterAll, FunSpec }
-import scala.concurrent.Await
-import scala.concurrent.ExecutionContext.Implicits.global
+import org.scalatest.{ BeforeAndAfterAll, AsyncFunSpec }
+import scala.concurrent._
 import scala.concurrent.duration._
 import scala.util.control.NonFatal
 import java.util.concurrent.CancellationException
 import java.util.concurrent.atomic.AtomicInteger
 
-trait TimerSpec extends FunSpec with BeforeAndAfterAll {
-  
+trait TimerSpec extends AsyncFunSpec with BeforeAndAfterAll {
+
+  implicit def ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+
   def newTimer: Timer
   def timerName: String
   implicit val timer = newTimer
@@ -21,35 +22,32 @@ trait TimerSpec extends FunSpec with BeforeAndAfterAll {
       val fut = Delay(1.seconds) {
         System.currentTimeMillis - start
       }.future
-      val value = Await.result(fut, 2.seconds)
-      value.millis.toSeconds === 1.seconds
+      fut.map(value => assert(value.millis.toSeconds === 1))
     }
 
     it ("should permit cancellation of delayed operations") {
       val cancel = Delay(1.seconds)(sys.error("this should never print"))
-      Await.result(Delay(150.millis) {
+      Delay(150.millis) {
         cancel.cancel()
-      }.future, 200.millis)
+      }.future.map(_ => succeed)
     }
 
     it ("cancellation of delayed operations should result in future failure") {
       val cancel = Delay(1.second)(sys.error("this should never print"))
-      Delay(150.millis) {
+      val cancelF = Delay(150.millis) {
         cancel.cancel()
       }
-      cancel.future.onFailure {
-        case NonFatal(e) => assert(e.getClass === classOf[CancellationException])
+      for { 
+        cf <- cancelF.future
+        c <- cancel.future.failed
+      } yield {
+        assert(c.getClass === classOf[CancellationException])
       }
     }
 
     it ("completion of delayed operations should result in a future success") {
       val future = Delay(1.second)(true).future
-      future.onFailure {
-        case NonFatal(_) => sys.error("this should never print")
-      }
-      future.onSuccess {
-        case value => assert(value === true)
-      }
+      future.map { value => assert(value === true)}
     }
 
     it ("should repeatedly execute an operation on a fixed delay") {
@@ -59,27 +57,28 @@ trait TimerSpec extends FunSpec with BeforeAndAfterAll {
         print('.')
         diff
       }
-      delay.future.onFailure { case NonFatal(_) => println() }
-      Await.ready(Delay(2.seconds) {
+      delay.future.failed.foreach { _ => println() }
+      Delay(2.seconds) {
         delay.cancel()
-      }.future, 3.seconds)
+      }.future.map(_ => succeed)
     }
 
     it ("cancellation of repeatedly delayed operations should result in future failure") {
-      val cancel = Delay.every(150.seconds)()(true)
       val counter = new AtomicInteger(0)
-      cancel.future.onFailure {
-        case NonFatal(e) =>
-          assert(e.getClass === classOf[CancellationException])
+      val cancel = Delay.every(150.seconds)()(true)
+      val cancelFut = cancel.future.recoverWith {
+        case e: CancellationException =>
           counter.incrementAndGet()
+          Future.unit
+        case _ => Future.unit
       }
-      Await.ready(Delay(2.seconds) {
+      val fut = Delay(2.seconds) {
         cancel.cancel()
-      }.future, 3.seconds)
-      Await.ready(cancel.future, 3.seconds)
-      Thread.sleep(100)
-      assert(counter.get() === 1)
+      }
+
+      cancelFut.map(_ => assert(counter.get() === 1))
     }
+
   }
 
   override def afterAll() {
