@@ -2,7 +2,7 @@ import BintrayPlugin.autoImport._
 
 organization in ThisBuild := "me.lessis"
 
-version in ThisBuild := "0.1.1"
+version in ThisBuild := "0.2.0"
 
 crossScalaVersions in ThisBuild := Seq("2.10.4", "2.11.1", "2.12.1")
 scalaVersion in ThisBuild := crossScalaVersions.value.last
