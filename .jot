@@ -1,4 +1,0 @@
-a default aggregated build should exist for all defined projects
-https://github.com/sbt/sbt/blob/137805ed019b24dcbdefeef730d07f9c22c4e493/main/src/main/scala/sbt/Load.scala#L422-L428
-https://github.com/sbt/sbt/blob/c5d0c4cd29621c64532b4bce5150ef3b2e2b86e7/main/src/main/scala/sbt/Build.scala#L60
-https://github.com/sbt/sbt/blob/c5d0c4cd29621c64532b4bce5150ef3b2e2b86e7/main/src/main/scala/sbt/Build.scala#L48

@@ -1,6 +1,6 @@
 # odelay
 
-[![Build Status](https://travis-ci.org/softprops/odelay.png?branch=master)](https://travis-ci.org/softprops/odelay)
+[![Build Status](https://travis-ci.org/softwaremill/odelay.png?branch=master)](https://travis-ci.org/softwaremill/odelay)
 
 Delayed reactions, fashioned from tools you already have sitting around your shed.
 
@@ -8,36 +8,30 @@ Delayed reactions, fashioned from tools you already have sitting around your she
 
 The current version of odelay is `0.2.0` and targets scala 2.12+. The odelay-twitter module is not published for 2.11.*.
 
-Add the following resolver to your build definition
-
-```scala
-resolvers += "softprops-maven" at "http://dl.bintray.com/content/softprops/maven"
-```
-
 ### modules
 
 * `odelay-core` odelay core interfaces and default jdk backed timer
 
 ```scala
-libraryDependencies += "me.lessis" %% "odelay-core" % "0.2.0"
+libraryDependencies += "com.softwaremill" %% "odelay-core" % "0.2.0"
 ```
 
 * `odelay-netty` netty 4 backed odelay timer interface
 
 ```scala
-libraryDependencies += "me.lessis" %% "odelay-netty" % "0.2.0"
+libraryDependencies += "com.softwaremill" %% "odelay-netty" % "0.2.0"
 ```
 
 * `odelay-netty3` netty 3 backed odelay timer interface
 
 ```scala
-libraryDependencies += "me.lessis" %% "odelay-netty3" % "0.2.0"
+libraryDependencies += "com.softwaremill" %% "odelay-netty3" % "0.2.0"
 ```
 
 * `odelay-twitter` twitter util backed odelay timer interface
 
 ```scala
-libraryDependencies += "me.lessis" %% "odelay-twitter" % "0.2.0"
+libraryDependencies += "com.softwaremill" %% "odelay-twitter" % "0.2.0"
 ```
 
 ## usage
@@ -244,7 +238,9 @@ delay.future.onFailure {
 }
 ```
 
-Doug Tangren (softprops) 2014
+## Credits
+
+Originally created by [Doug Tangren](https://github.com/softprops), maintained by [SoftwareMill](https://softwaremill.com).
 
 [fd]: http://www.scala-lang.org/api/current/index.html#scala.concurrent.duration.FiniteDuration
 [fut]: http://www.scala-lang.org/api/current/index.html#scala.concurrent.Future

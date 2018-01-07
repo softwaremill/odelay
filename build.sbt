@@ -1,10 +1,8 @@
-import BintrayPlugin.autoImport._
+organization in ThisBuild := "com.softwaremill"
 
-organization in ThisBuild := "me.lessis"
+version in ThisBuild := "0.3.0"
 
-version in ThisBuild := "0.2.0"
-
-crossScalaVersions in ThisBuild := Seq("2.10.4", "2.11.1", "2.12.1")
+crossScalaVersions in ThisBuild := Seq("2.11.11", "2.12.4")
 scalaVersion in ThisBuild := crossScalaVersions.value.last
 
 scalacOptions in ThisBuild ++= Seq(Opts.compile.deprecation) ++
@@ -14,14 +12,38 @@ scalacOptions in ThisBuild ++= Seq(Opts.compile.deprecation) ++
 licenses in ThisBuild := Seq(
   ("MIT", url(s"https://github.com/softprops/odelay/blob/${version.value}/LICENSE")))
 
-homepage in ThisBuild := Some(url(s"https://github.com/softprops/${name.value}/"))
+homepage in ThisBuild := Some(url(s"https://softwaremill.com/open-source/"))
 
-val commonSettings =  lsSettings ++ Seq(
-  LsKeys.tags in LsKeys.lsync := Seq("delay", "scheduling", "future"),
-  bintrayPackageLabels := (LsKeys.tags in LsKeys.lsync).value,
-  resolvers += sbt.Resolver.bintrayRepo("softprops","maven"),
-  externalResolvers in LsKeys.lsync := (resolvers in bintray).value
+// publishing
+publishTo := Some(
+  if (isSnapshot.value)
+    Opts.resolver.sonatypeSnapshots
+  else
+    Opts.resolver.sonatypeStaging
 )
+
+publishArtifact in Test := false
+
+publishMavenStyle := true
+
+scmInfo := Some(
+  ScmInfo(url("https://github.com/softwaremill/odelay"),
+    "scm:git:git@github.com/softwaremill/odelay.git"))
+
+developers := List(
+  Developer("adamw", "Adam Warski", "", url("https://softwaremill.com")),
+  Developer("softprops", "Doug Tangren", "", url("https://github.com/softprops")))
+
+homepage := Some(url("http://softwaremill.com/open-source"))
+
+sonatypeProfileName := "com.softwaremill"
+
+// sbt-release
+releaseCrossBuild := true
+
+releasePublishArtifactsAction := PgpKeys.publishSigned.value
+
+val commonSettings = Seq()
 
 val unpublished = Seq(publish := {}, publishLocal := {})
 
@@ -37,12 +59,12 @@ lazy val odelaytesting = (crossProject in file("odelay-testing"))
 lazy val `odelay-testing-js` =
   odelaytesting.js
     .dependsOn(`odelay-core-js`)
-    .settings(libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.1" % "test")
+    .settings(libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.4" % "test")
 
 lazy val `odelay-testing` =
   odelaytesting.jvm
     .dependsOn(`odelay-core-jvm`)
-    .settings(libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test")
+    .settings(libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.4" % "test")
 
 lazy val `odelay-core-tests` =
   project.dependsOn(`odelay-testing` % "test->test")
@@ -60,15 +82,3 @@ lazy val `odelay-twitter` =
   project.dependsOn(`odelay-core-jvm`, `odelay-testing` % "test->test")
     .settings(commonSettings:_*)
 
-pomExtra in ThisBuild := (
-  <scm>
-    <url>git@github.com:softprops/odelay.git</url>
-    <connection>scm:git:git@github.com:softprops/odelay.git</connection>
-  </scm>
-  <developers>
-    <developer>
-      <id>softprops</id>
-      <name>Doug Tangren</name>
-      <url>https://github.com/softprops</url>
-    </developer>
-  </developers>)
