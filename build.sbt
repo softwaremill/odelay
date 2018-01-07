@@ -1,15 +1,14 @@
 import sbtrelease.ReleaseStateTransformations._
 
 val commonSettings = Seq(
-  organization in ThisBuild := "com.softwaremill.odelay",
-  crossScalaVersions in ThisBuild := Seq("2.11.11", "2.12.4"),
-  scalaVersion in ThisBuild := crossScalaVersions.value.last,
-  scalacOptions in ThisBuild ++= Seq(Opts.compile.deprecation) ++
+  organization := "com.softwaremill.odelay",
+  crossScalaVersions := Seq("2.11.11", "2.12.4"),
+  scalaVersion := crossScalaVersions.value.last,
+  scalacOptions ++= Seq(Opts.compile.deprecation) ++
     Seq("-Ywarn-unused-import", "-Ywarn-unused", "-Xlint", "-feature").filter(
       Function.const(scalaVersion.value.startsWith("2.11"))),
-  licenses in ThisBuild := Seq(
+  licenses := Seq(
     ("MIT", url(s"https://github.com/softprops/odelay/blob/${version.value}/LICENSE"))),
-  homepage in ThisBuild := Some(url(s"https://softwaremill.com/open-source/")),
   // publishing
   publishTo := Some(
     if (isSnapshot.value)
