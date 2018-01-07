@@ -1,3 +1,5 @@
+import sbtrelease.ReleaseStateTransformations._
+
 val commonSettings = Seq(
   organization in ThisBuild := "com.softwaremill.odelay",
   crossScalaVersions in ThisBuild := Seq("2.11.11", "2.12.4"),
@@ -27,7 +29,24 @@ val commonSettings = Seq(
   sonatypeProfileName := "com.softwaremill",
   // sbt-release
   releaseCrossBuild := true,
-  releasePublishArtifactsAction := PgpKeys.publishSigned.value
+  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
+  releaseProcess := Seq(
+    checkSnapshotDependencies,
+    inquireVersions,
+    // publishing locally so that the pgp password prompt is displayed early
+    // in the process
+    releaseStepCommand("publishLocalSigned"),
+    runClean,
+    runTest,
+    setReleaseVersion,
+    commitReleaseVersion,
+    tagRelease,
+    publishArtifacts,
+    setNextVersion,
+    commitNextVersion,
+    releaseStepCommand("sonatypeReleaseAll"),
+    pushChanges
+  )
 )
 
 val unpublished = Seq(publish := {}, publishLocal := {})
