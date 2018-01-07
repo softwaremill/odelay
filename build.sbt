@@ -1,4 +1,4 @@
-organization in ThisBuild := "com.softwaremill"
+organization in ThisBuild := "com.softwaremill.odelay"
 
 version in ThisBuild := "0.3.0"
 

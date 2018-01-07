@@ -13,25 +13,25 @@ The current version of odelay is `0.2.0` and targets scala 2.12+. The odelay-twi
 * `odelay-core` odelay core interfaces and default jdk backed timer
 
 ```scala
-libraryDependencies += "com.softwaremill" %% "odelay-core" % "0.2.0"
+libraryDependencies += "com.softwaremill.odelay" %% "odelay-core" % "0.2.0"
 ```
 
 * `odelay-netty` netty 4 backed odelay timer interface
 
 ```scala
-libraryDependencies += "com.softwaremill" %% "odelay-netty" % "0.2.0"
+libraryDependencies += "com.softwaremill.odelay" %% "odelay-netty" % "0.2.0"
 ```
 
 * `odelay-netty3` netty 3 backed odelay timer interface
 
 ```scala
-libraryDependencies += "com.softwaremill" %% "odelay-netty3" % "0.2.0"
+libraryDependencies += "com.softwaremill.odelay" %% "odelay-netty3" % "0.2.0"
 ```
 
 * `odelay-twitter` twitter util backed odelay timer interface
 
 ```scala
-libraryDependencies += "com.softwaremill" %% "odelay-twitter" % "0.2.0"
+libraryDependencies += "com.softwaremill.odelay" %% "odelay-twitter" % "0.2.0"
 ```
 
 ## usage
