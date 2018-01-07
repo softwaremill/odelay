@@ -6,32 +6,32 @@ Delayed reactions, fashioned from tools you already have sitting around your she
 
 ## installation
 
-The current version of odelay is `0.2.0` and targets scala 2.12+. The odelay-twitter module is not published for 2.11.*.
+The current version of odelay is `0.3.0` and targets scala 2.12+. The odelay-twitter module is not published for 2.11.*.
 
 ### modules
 
 * `odelay-core` odelay core interfaces and default jdk backed timer
 
 ```scala
-libraryDependencies += "com.softwaremill.odelay" %% "odelay-core" % "0.2.0"
+libraryDependencies += "com.softwaremill.odelay" %% "odelay-core" % "0.3.0"
 ```
 
 * `odelay-netty` netty 4 backed odelay timer interface
 
 ```scala
-libraryDependencies += "com.softwaremill.odelay" %% "odelay-netty" % "0.2.0"
+libraryDependencies += "com.softwaremill.odelay" %% "odelay-netty" % "0.3.0"
 ```
 
 * `odelay-netty3` netty 3 backed odelay timer interface
 
 ```scala
-libraryDependencies += "com.softwaremill.odelay" %% "odelay-netty3" % "0.2.0"
+libraryDependencies += "com.softwaremill.odelay" %% "odelay-netty3" % "0.3.0"
 ```
 
 * `odelay-twitter` twitter util backed odelay timer interface
 
 ```scala
-libraryDependencies += "com.softwaremill.odelay" %% "odelay-twitter" % "0.2.0"
+libraryDependencies += "com.softwaremill.odelay" %% "odelay-twitter" % "0.3.0"
 ```
 
 ## usage
