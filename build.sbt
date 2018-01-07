@@ -32,6 +32,8 @@ val commonSettings = Seq(
 
 val unpublished = Seq(publish := {}, publishLocal := {})
 
+commonSettings
+
 lazy val `odelay-core` = (crossProject in file("odelay-core")).
   settings(commonSettings:_*)
 
