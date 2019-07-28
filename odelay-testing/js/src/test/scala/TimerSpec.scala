@@ -71,7 +71,7 @@ class TimerSpec extends AsyncFunSpec with BeforeAndAfterAll {
     it ("cancellation of repeatedly delayed operations should result in future failure") {
       val cancel = Delay.every(150.seconds)()(true)
       val counter = new AtomicInteger(0)
-      cancel.future.onFailure {
+      cancel.future.failed.foreach {
         case NonFatal(e) =>
           assert(e.getClass === classOf[CancellationException])
           counter.incrementAndGet()

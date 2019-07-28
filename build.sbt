@@ -1,8 +1,18 @@
+import sbt.settingKey
 import sbtrelease.ReleaseStateTransformations._
+
+lazy val is2_11_or_2_12 = settingKey[Boolean]("Is the scala version 2.11 or 2.12.")
+
+val only2_11_and_2_12_settings = Seq(
+  publishArtifact := is2_11_or_2_12.value,
+  skip in compile := !is2_11_or_2_12.value,
+  skip in publish := !is2_11_or_2_12.value,
+  libraryDependencies := (if (is2_11_or_2_12.value) libraryDependencies.value else Nil)
+)
 
 val commonSettings = Seq(
   organization := "com.softwaremill.odelay",
-  crossScalaVersions := Seq("2.11.11", "2.12.4"),
+  crossScalaVersions := Seq("2.11.11", "2.13.0", "2.12.8"),
   scalaVersion := crossScalaVersions.value.last,
   scalacOptions ++= Seq(Opts.compile.deprecation) ++
     Seq("-Ywarn-unused-import", "-Ywarn-unused", "-Xlint", "-feature").filter(
@@ -45,7 +55,8 @@ val commonSettings = Seq(
     commitNextVersion,
     releaseStepCommand("sonatypeReleaseAll"),
     pushChanges
-  )
+  ),
+  is2_11_or_2_12 := scalaVersion.value.startsWith("2.11.") || scalaVersion.value.startsWith("2.12.")
 )
 
 val unpublished = Seq(publish := {}, publishLocal := {})
@@ -66,13 +77,13 @@ lazy val `odelay-testing-js` =
   odelaytesting.js
     .dependsOn(`odelay-core-js`)
     .settings(commonSettings:_*)
-    .settings(libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.4" % "test")
+    .settings(libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.8" % "test")
 
 lazy val `odelay-testing` =
   odelaytesting.jvm
     .dependsOn(`odelay-core-jvm`)
     .settings(commonSettings:_*)
-    .settings(libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.4" % "test")
+    .settings(libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.8" % "test")
 
 lazy val `odelay-core-tests` =
   project.dependsOn(`odelay-testing` % "test->test")
@@ -90,4 +101,5 @@ lazy val `odelay-netty` =
 lazy val `odelay-twitter` =
   project.dependsOn(`odelay-core-jvm`, `odelay-testing` % "test->test")
     .settings(commonSettings:_*)
+    .settings(only2_11_and_2_12_settings)
 
