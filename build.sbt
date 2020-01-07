@@ -12,7 +12,7 @@ val only2_11_and_2_12_settings = Seq(
 
 val commonSettings = Seq(
   organization := "com.softwaremill.odelay",
-  crossScalaVersions := Seq("2.11.11", "2.13.0", "2.12.8"),
+  crossScalaVersions := Seq("2.11.12", "2.13.1", "2.12.10"),
   scalaVersion := crossScalaVersions.value.last,
   scalacOptions ++= Seq(Opts.compile.deprecation) ++
     Seq("-Ywarn-unused-import", "-Ywarn-unused", "-Xlint", "-feature").filter(

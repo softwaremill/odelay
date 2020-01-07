@@ -5,7 +5,7 @@ import scala.annotation.implicitNotFound
 
 /** The deferrer of some arbitrary operation */
 @implicitNotFound(
-  "Cannot find an implicit odelay.Timer, either define one yourself or import odelay.Default.timer")
+  "Cannot find an implicit odelay.Timer, either define one yourself or import odelay.Timer.default")
 trait Timer {
   /** Delays the execution of an operation until the provided duration */
   def apply[T](delay: FiniteDuration, op: => T): Delay[T]
