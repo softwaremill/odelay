@@ -12,7 +12,7 @@ val only2_11_and_2_12_settings = Seq(
 
 val commonSettings = Seq(
   organization := "com.softwaremill.odelay",
-  crossScalaVersions := Seq("2.11.12", "2.13.1", "2.12.10"),
+  crossScalaVersions := Seq("2.11.12", "2.13.4", "2.12.12"),
   scalaVersion := crossScalaVersions.value.last,
   scalacOptions ++= Seq(Opts.compile.deprecation) ++
     Seq("-Ywarn-unused-import", "-Ywarn-unused", "-Xlint", "-feature").filter(
@@ -63,13 +63,15 @@ val unpublished = Seq(publish := {}, publishLocal := {})
 
 commonSettings
 
-lazy val `odelay-core` = (crossProject in file("odelay-core")).
-  settings(commonSettings:_*)
+lazy val `odelay-core` = crossProject(JSPlatform, JVMPlatform)
+  .in(file("odelay-core"))
+  .settings(commonSettings:_*)
 
 lazy val `odelay-core-js` = `odelay-core`.js
 lazy val `odelay-core-jvm` = `odelay-core`.jvm
 
-lazy val odelaytesting = (crossProject in file("odelay-testing"))
+lazy val odelaytesting = crossProject(JSPlatform, JVMPlatform)
+  .in(file("odelay-testing"))
   .settings(commonSettings:_*)
   .settings(unpublished:_*)
 
@@ -77,13 +79,13 @@ lazy val `odelay-testing-js` =
   odelaytesting.js
     .dependsOn(`odelay-core-js`)
     .settings(commonSettings:_*)
-    .settings(libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.8" % "test")
+    .settings(libraryDependencies += "org.scalatest" %%% "scalatest" % "3.1.4" % "test")
 
 lazy val `odelay-testing` =
   odelaytesting.jvm
     .dependsOn(`odelay-core-jvm`)
     .settings(commonSettings:_*)
-    .settings(libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.8" % "test")
+    .settings(libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.4" % "test")
 
 lazy val `odelay-core-tests` =
   project.dependsOn(`odelay-testing` % "test->test")
