@@ -1,7 +1,8 @@
 package odelay.testing
 
 import odelay.{ Delay, Timer }
-import org.scalatest.{ BeforeAndAfterAll, AsyncFunSpec }
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funspec.AsyncFunSpec
 import scala.concurrent._
 import scala.concurrent.duration._
 import scala.util.control.NonFatal
@@ -14,7 +15,7 @@ trait TimerSpec extends AsyncFunSpec with BeforeAndAfterAll {
 
   def newTimer: Timer
   def timerName: String
-  implicit val timer = newTimer
+  implicit val timer: Timer = newTimer
 
   describe (timerName) {
     it ("should execute an operation after an initial delay") {
@@ -81,7 +82,7 @@ trait TimerSpec extends AsyncFunSpec with BeforeAndAfterAll {
 
   }
 
-  override def afterAll() {
+  override def afterAll(): Unit = {
     timer.stop()
   }
 }
