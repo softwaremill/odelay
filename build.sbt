@@ -5,14 +5,14 @@ lazy val is2_11_or_2_12 = settingKey[Boolean]("Is the scala version 2.11 or 2.12
 
 val only2_11_and_2_12_settings = Seq(
   publishArtifact := is2_11_or_2_12.value,
-  skip in compile := !is2_11_or_2_12.value,
-  skip in publish := !is2_11_or_2_12.value,
+  compile / skip := !is2_11_or_2_12.value,
+  publish / skip := !is2_11_or_2_12.value,
   libraryDependencies := (if (is2_11_or_2_12.value) libraryDependencies.value else Nil)
 )
 
 val commonSettings = Seq(
   organization := "com.softwaremill.odelay",
-  crossScalaVersions := Seq("2.11.12", "2.13.4", "2.12.12"),
+  crossScalaVersions := Seq("2.11.12", "2.13.4", "3.0.0", "2.12.12"),
   scalaVersion := crossScalaVersions.value.last,
   scalacOptions ++= Seq(Opts.compile.deprecation) ++
     Seq("-Ywarn-unused-import", "-Ywarn-unused", "-Xlint", "-feature").filter(
@@ -26,7 +26,7 @@ val commonSettings = Seq(
     else
       Opts.resolver.sonatypeStaging
   ),
-  publishArtifact in Test := false,
+  Test / publishArtifact := false,
   publishMavenStyle := true,
   scmInfo := Some(
     ScmInfo(url("https://github.com/softwaremill/odelay"),
@@ -79,13 +79,13 @@ lazy val `odelay-testing-js` =
   odelaytesting.js
     .dependsOn(`odelay-core-js`)
     .settings(commonSettings:_*)
-    .settings(libraryDependencies += "org.scalatest" %%% "scalatest" % "3.1.4" % "test")
+    .settings(libraryDependencies += "org.scalatest" %%% "scalatest" % "3.2.9" % "test")
 
 lazy val `odelay-testing` =
   odelaytesting.jvm
     .dependsOn(`odelay-core-jvm`)
     .settings(commonSettings:_*)
-    .settings(libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.4" % "test")
+    .settings(libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.9" % "test")
 
 lazy val `odelay-core-tests` =
   project.dependsOn(`odelay-testing` % "test->test")
