@@ -5,7 +5,7 @@ val scala2_11 = "2.11.12"
 val scala2_12 = "2.12.16"
 val scala2_13 = "2.13.8"
 val scala2 = List(scala2_11, scala2_12, scala2_13)
-val scala3 = List("3.1.3")
+val scala3 = List("3.2.0")
 
 val scalatestVersion = "3.2.13"
 
@@ -13,8 +13,7 @@ excludeLintKeys in Global ++= Set(ideSkipProject)
 
 val commonSettings = commonSmlBuildSettings ++ ossPublishSettings ++ Seq(
   organization := "com.softwaremill.odelay",
-  licenses := Seq(
-    ("MIT", url(s"https://github.com/softprops/odelay/blob/${version.value}/LICENSE"))),
+  licenses := Seq(("MIT", url(s"https://github.com/softprops/odelay/blob/${version.value}/LICENSE")))
 )
 
 val commonJvmSettings = commonSettings ++ Seq(
@@ -28,7 +27,9 @@ val commonJsSettings = commonSettings ++ Seq(
 lazy val rootProject = (project in file("."))
   .settings(commonSettings: _*)
   .settings(publish / skip := true, name := "odelay", scalaVersion := scala2_13)
-  .aggregate(core.projectRefs ++ testing.projectRefs ++ coreTests.projectRefs ++ netty3.projectRefs ++ netty.projectRefs ++ twitter.projectRefs: _*)
+  .aggregate(
+    core.projectRefs ++ testing.projectRefs ++ coreTests.projectRefs ++ netty3.projectRefs ++ netty.projectRefs ++ twitter.projectRefs: _*
+  )
 
 lazy val core = (projectMatrix in file("odelay-core"))
   .settings(
@@ -114,4 +115,3 @@ lazy val twitter = (projectMatrix in file("odelay-twitter"))
     settings = commonJvmSettings
   )
   .dependsOn(core, testing % "test->test")
-
