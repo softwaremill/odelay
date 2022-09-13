@@ -1,9 +1,9 @@
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.5.1")
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.10.1")
+addSbtPlugin("com.eed3si9n" % "sbt-projectmatrix" % "0.9.0")
 
-addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.0.0")
+val sbtSoftwareMillVersion = "2.0.9"
+addSbtPlugin("com.softwaremill.sbt-softwaremill" % "sbt-softwaremill-common" % sbtSoftwareMillVersion)
+addSbtPlugin("com.softwaremill.sbt-softwaremill" % "sbt-softwaremill-publish" % sbtSoftwareMillVersion)
+addSbtPlugin("com.softwaremill.sbt-softwaremill" % "sbt-softwaremill-browser-test-js" % sbtSoftwareMillVersion)
 
-addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "2.0")
-
-addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.1.0")
-
-addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.6")
+addSbtPlugin("org.jetbrains" % "sbt-ide-settings" % "1.1.0")

@@ -76,6 +76,7 @@ class TimerSpec extends AsyncFunSpec with BeforeAndAfterAll {
         case NonFatal(e) =>
           assert(e.getClass === classOf[CancellationException])
           counter.incrementAndGet()
+        case _ =>
       }
 
       val canceltrueloop = Delay(2.seconds) {

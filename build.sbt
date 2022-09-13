@@ -1,107 +1,114 @@
-import sbt.settingKey
-import sbtrelease.ReleaseStateTransformations._
+import com.softwaremill.SbtSoftwareMillCommon.commonSmlBuildSettings
+import com.softwaremill.Publish.ossPublishSettings
 
-lazy val is2_11_or_2_12 = settingKey[Boolean]("Is the scala version 2.11 or 2.12.")
+val scala2_11 = "2.11.12"
+val scala2_12 = "2.12.16"
+val scala2_13 = "2.13.8"
+val scala2 = List(scala2_11, scala2_12, scala2_13)
+val scala3 = List("3.1.3")
 
-val only2_11_and_2_12_settings = Seq(
-  publishArtifact := is2_11_or_2_12.value,
-  compile / skip := !is2_11_or_2_12.value,
-  publish / skip := !is2_11_or_2_12.value,
-  libraryDependencies := (if (is2_11_or_2_12.value) libraryDependencies.value else Nil)
-)
+excludeLintKeys in Global ++= Set(ideSkipProject)
 
-val commonSettings = Seq(
+val commonSettings = commonSmlBuildSettings ++ ossPublishSettings ++ Seq(
   organization := "com.softwaremill.odelay",
-  crossScalaVersions := Seq("2.11.12", "2.13.4", "3.0.0", "2.12.12"),
-  scalaVersion := crossScalaVersions.value.last,
-  scalacOptions ++= Seq(Opts.compile.deprecation) ++
-    Seq("-Ywarn-unused-import", "-Ywarn-unused", "-Xlint", "-feature").filter(
-      Function.const(scalaVersion.value.startsWith("2.11"))),
   licenses := Seq(
     ("MIT", url(s"https://github.com/softprops/odelay/blob/${version.value}/LICENSE"))),
-  // publishing
-  publishTo := Some(
-    if (isSnapshot.value)
-      Opts.resolver.sonatypeSnapshots
-    else
-      Opts.resolver.sonatypeStaging
-  ),
-  Test / publishArtifact := false,
-  publishMavenStyle := true,
-  scmInfo := Some(
-    ScmInfo(url("https://github.com/softwaremill/odelay"),
-      "scm:git:git@github.com/softwaremill/odelay.git")),
-  developers := List(
-    Developer("adamw", "Adam Warski", "", url("https://softwaremill.com")),
-    Developer("softprops", "Doug Tangren", "", url("https://github.com/softprops"))),
-  homepage := Some(url("http://softwaremill.com/open-source")),
-  sonatypeProfileName := "com.softwaremill",
-  // sbt-release
-  releaseCrossBuild := true,
-  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
-  releaseProcess := Seq(
-    checkSnapshotDependencies,
-    inquireVersions,
-    // publishing locally so that the pgp password prompt is displayed early
-    // in the process
-    releaseStepCommand("publishLocalSigned"),
-    runClean,
-    runTest,
-    setReleaseVersion,
-    commitReleaseVersion,
-    tagRelease,
-    publishArtifacts,
-    setNextVersion,
-    commitNextVersion,
-    releaseStepCommand("sonatypeReleaseAll"),
-    pushChanges
-  ),
-  is2_11_or_2_12 := scalaVersion.value.startsWith("2.11.") || scalaVersion.value.startsWith("2.12.")
 )
 
-val unpublished = Seq(publish := {}, publishLocal := {})
+val commonJvmSettings = commonSettings ++ Seq(
+  ideSkipProject := (scalaVersion.value != scala2_13)
+)
 
-commonSettings
+val commonJsSettings = commonSettings ++ Seq(
+  ideSkipProject := true
+)
 
-lazy val `odelay-core` = crossProject(JSPlatform, JVMPlatform)
-  .in(file("odelay-core"))
-  .settings(commonSettings:_*)
+lazy val rootProject = (project in file("."))
+  .settings(commonSettings: _*)
+  .settings(publish / skip := true, name := "odelay", scalaVersion := scala2_13)
+  .aggregate(core.projectRefs ++ testing.projectRefs ++ coreTests.projectRefs ++ netty3.projectRefs ++ netty.projectRefs ++twitter.projectRefs: _*)
 
-lazy val `odelay-core-js` = `odelay-core`.js
-lazy val `odelay-core-jvm` = `odelay-core`.jvm
+lazy val core = (projectMatrix in file("odelay-core"))
+  .settings(
+    name := "odelay-core",
+    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.2.9" % "test",
+    description := "provides api and jdk times as potential default"
+  )
+  .jvmPlatform(
+    scalaVersions = scala2 ++ scala3,
+    settings = commonJvmSettings
+  )
+  .jsPlatform(
+    scalaVersions = scala2 ++ scala3,
+    settings = commonJsSettings
+  )
 
-lazy val odelaytesting = crossProject(JSPlatform, JVMPlatform)
-  .in(file("odelay-testing"))
-  .settings(commonSettings:_*)
-  .settings(unpublished:_*)
+lazy val testing = (projectMatrix in file("odelay-testing"))
+  .settings(
+    name := "odelay-testing",
+    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.2.9" % "test",
+    publish / skip := true
+  )
+  .jvmPlatform(
+    scalaVersions = scala2 ++ scala3,
+    settings = commonJvmSettings
+  )
+  .jsPlatform(
+    scalaVersions = scala2 ++ scala3,
+    settings = commonJsSettings
+  )
+  .dependsOn(core)
 
-lazy val `odelay-testing-js` =
-  odelaytesting.js
-    .dependsOn(`odelay-core-js`)
-    .settings(commonSettings:_*)
-    .settings(libraryDependencies += "org.scalatest" %%% "scalatest" % "3.2.9" % "test")
+lazy val coreTests = (projectMatrix in file("odelay-core-tests"))
+  .settings(
+    name := "odelay-core-tests",
+    publish / skip := true
+  )
+  .jvmPlatform(
+    scalaVersions = scala2 ++ scala3,
+    settings = commonJvmSettings
+  )
+  .dependsOn(testing % "test->test")
 
-lazy val `odelay-testing` =
-  odelaytesting.jvm
-    .dependsOn(`odelay-core-jvm`)
-    .settings(commonSettings:_*)
-    .settings(libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.9" % "test")
+lazy val netty3 = (projectMatrix in file("odelay-netty3"))
+  .settings(
+    name := "odelay-netty3",
+    description := "an odelay.Timer implementation backed by netty 3",
+    libraryDependencies += "io.netty" % "netty" % "3.10.6.Final"
+  )
+  .jvmPlatform(
+    scalaVersions = scala2 ++ scala3,
+    settings = commonJvmSettings
+  )
+  .dependsOn(core, testing % "test->test")
 
-lazy val `odelay-core-tests` =
-  project.dependsOn(`odelay-testing` % "test->test")
-    .settings(commonSettings:_*)
-    .settings(unpublished:_*)
+lazy val netty = (projectMatrix in file("odelay-netty"))
+  .settings(
+    name := "odelay-netty",
+    description := "an odelay.Timer implementation backed by netty 4",
+    libraryDependencies += "io.netty" % "netty-common" % "4.1.19.Final"
+  )
+  .jvmPlatform(
+    scalaVersions = scala2 ++ scala3,
+    settings = commonJvmSettings
+  )
+  .dependsOn(core, testing % "test->test")
 
-lazy val `odelay-netty3` =
-  project.dependsOn(`odelay-core-jvm`, `odelay-testing` % "test->test")
-    .settings(commonSettings:_*)
-
-lazy val `odelay-netty` =
-  project.dependsOn(`odelay-core-jvm`, `odelay-testing` % "test->test")
-    .settings(commonSettings:_*)
-
-lazy val `odelay-twitter` =
-  project.dependsOn(`odelay-core-jvm`, `odelay-testing` % "test->test")
-    .settings(commonSettings:_*)
-    .settings(only2_11_and_2_12_settings)
+lazy val twitter = (projectMatrix in file("odelay-twitter"))
+  .settings(
+    name := "odelay-twitter",
+    libraryDependencies := (scalaVersion.value match {
+      case rewrite if rewrite.startsWith("2.11") =>
+        Seq("com.twitter" % "util-core_2.11" % "6.42.0")
+      case rewrite if rewrite.startsWith("2.12") =>
+        Seq("com.twitter" %% "util-core" % "17.12.0")
+      case _ => Nil
+    }) ++ libraryDependencies.value,
+    description := "an odelay.Timer implementation backed by a com.twitter.util.Timer"
+  )
+  .jvmPlatform(
+    scalaVersions = List(scala2_11, scala2_12),
+    settings = commonJvmSettings
+  )
+  .dependsOn(core, testing % "test->test")
 
