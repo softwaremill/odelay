@@ -13,8 +13,7 @@ excludeLintKeys in Global ++= Set(ideSkipProject)
 
 val commonSettings = commonSmlBuildSettings ++ ossPublishSettings ++ Seq(
   organization := "com.softwaremill.odelay",
-  licenses := Seq(
-    ("MIT", url(s"https://github.com/softprops/odelay/blob/${version.value}/LICENSE"))),
+  licenses := Seq(("MIT", url(s"https://github.com/softprops/odelay/blob/${version.value}/LICENSE")))
 )
 
 val commonJvmSettings = commonSettings ++ Seq(
@@ -28,7 +27,9 @@ val commonJsSettings = commonSettings ++ Seq(
 lazy val rootProject = (project in file("."))
   .settings(commonSettings: _*)
   .settings(publish / skip := true, name := "odelay", scalaVersion := scala2_13)
-  .aggregate(core.projectRefs ++ testing.projectRefs ++ coreTests.projectRefs ++ netty3.projectRefs ++ netty.projectRefs ++ twitter.projectRefs: _*)
+  .aggregate(
+    core.projectRefs ++ testing.projectRefs ++ coreTests.projectRefs ++ netty3.projectRefs ++ netty.projectRefs ++ twitter.projectRefs: _*
+  )
 
 lazy val core = (projectMatrix in file("odelay-core"))
   .settings(
@@ -104,7 +105,7 @@ lazy val twitter = (projectMatrix in file("odelay-twitter"))
       case rewrite if rewrite.startsWith("2.11") =>
         Seq("com.twitter" % "util-core_2.11" % "6.42.0")
       case rewrite if rewrite.startsWith("2.12") =>
-        Seq("com.twitter" %% "util-core" % "17.12.0")
+        Seq("com.twitter" %% "util-core" % "22.7.0")
       case _ => Nil
     }) ++ libraryDependencies.value,
     description := "an odelay.Timer implementation backed by a com.twitter.util.Timer"
@@ -114,4 +115,3 @@ lazy val twitter = (projectMatrix in file("odelay-twitter"))
     settings = commonJvmSettings
   )
   .dependsOn(core, testing % "test->test")
-
