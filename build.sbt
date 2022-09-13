@@ -7,6 +7,8 @@ val scala2_13 = "2.13.8"
 val scala2 = List(scala2_11, scala2_12, scala2_13)
 val scala3 = List("3.1.3")
 
+val scalatestVersion = "3.2.13"
+
 excludeLintKeys in Global ++= Set(ideSkipProject)
 
 val commonSettings = commonSmlBuildSettings ++ ossPublishSettings ++ Seq(
@@ -31,7 +33,6 @@ lazy val rootProject = (project in file("."))
 lazy val core = (projectMatrix in file("odelay-core"))
   .settings(
     name := "odelay-core",
-    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.2.9" % "test",
     description := "provides api and jdk times as potential default"
   )
   .jvmPlatform(
@@ -46,7 +47,7 @@ lazy val core = (projectMatrix in file("odelay-core"))
 lazy val testing = (projectMatrix in file("odelay-testing"))
   .settings(
     name := "odelay-testing",
-    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.2.9" % "test",
+    libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % Test,
     publish / skip := true
   )
   .jvmPlatform(
@@ -55,7 +56,9 @@ lazy val testing = (projectMatrix in file("odelay-testing"))
   )
   .jsPlatform(
     scalaVersions = scala2 ++ scala3,
-    settings = commonJsSettings
+    settings = commonJsSettings ++ Seq(
+      libraryDependencies += "io.github.cquiroz" %%% "scala-java-time" % "2.4.0"
+    )
   )
   .dependsOn(core)
 
