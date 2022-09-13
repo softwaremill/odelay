@@ -26,7 +26,7 @@ val commonJsSettings = commonSettings ++ Seq(
 lazy val rootProject = (project in file("."))
   .settings(commonSettings: _*)
   .settings(publish / skip := true, name := "odelay", scalaVersion := scala2_13)
-  .aggregate(core.projectRefs ++ testing.projectRefs ++ coreTests.projectRefs ++ netty3.projectRefs ++ netty.projectRefs ++twitter.projectRefs: _*)
+  .aggregate(core.projectRefs ++ testing.projectRefs ++ coreTests.projectRefs ++ netty3.projectRefs ++ netty.projectRefs ++ twitter.projectRefs: _*)
 
 lazy val core = (projectMatrix in file("odelay-core"))
   .settings(
