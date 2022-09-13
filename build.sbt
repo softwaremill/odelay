@@ -13,8 +13,7 @@ excludeLintKeys in Global ++= Set(ideSkipProject)
 
 val commonSettings = commonSmlBuildSettings ++ ossPublishSettings ++ Seq(
   organization := "com.softwaremill.odelay",
-  licenses := Seq(
-    ("MIT", url(s"https://github.com/softprops/odelay/blob/${version.value}/LICENSE"))),
+  licenses := Seq(("MIT", url(s"https://github.com/softprops/odelay/blob/${version.value}/LICENSE")))
 )
 
 val commonJvmSettings = commonSettings ++ Seq(
@@ -28,7 +27,9 @@ val commonJsSettings = commonSettings ++ Seq(
 lazy val rootProject = (project in file("."))
   .settings(commonSettings: _*)
   .settings(publish / skip := true, name := "odelay", scalaVersion := scala2_13)
-  .aggregate(core.projectRefs ++ testing.projectRefs ++ coreTests.projectRefs ++ netty3.projectRefs ++ netty.projectRefs ++ twitter.projectRefs: _*)
+  .aggregate(
+    core.projectRefs ++ testing.projectRefs ++ coreTests.projectRefs ++ netty3.projectRefs ++ netty.projectRefs ++ twitter.projectRefs: _*
+  )
 
 lazy val core = (projectMatrix in file("odelay-core"))
   .settings(
@@ -89,7 +90,7 @@ lazy val netty = (projectMatrix in file("odelay-netty"))
   .settings(
     name := "odelay-netty",
     description := "an odelay.Timer implementation backed by netty 4",
-    libraryDependencies += "io.netty" % "netty-common" % "4.1.19.Final"
+    libraryDependencies += "io.netty" % "netty-common" % "4.1.81.Final"
   )
   .jvmPlatform(
     scalaVersions = scala2 ++ scala3,
@@ -114,4 +115,3 @@ lazy val twitter = (projectMatrix in file("odelay-twitter"))
     settings = commonJvmSettings
   )
   .dependsOn(core, testing % "test->test")
-
