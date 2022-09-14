@@ -103,7 +103,7 @@ lazy val twitter = (projectMatrix in file("odelay-twitter"))
     name := "odelay-twitter",
     libraryDependencies := (scalaVersion.value match {
       case rewrite if rewrite.startsWith("2.11") =>
-        Seq("com.twitter" % "util-core_2.11" % "6.45.0")
+        Seq("com.twitter" % "util-core_2.11" % "21.2.0")
       case rewrite if rewrite.startsWith("2.12") =>
         Seq("com.twitter" %% "util-core" % "22.7.0")
       case _ => Nil
