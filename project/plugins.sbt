@@ -1,4 +1,4 @@
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.12.0")
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.13.1")
 addSbtPlugin("com.eed3si9n" % "sbt-projectmatrix" % "0.9.0")
 
 val sbtSoftwareMillVersion = "2.0.12"
