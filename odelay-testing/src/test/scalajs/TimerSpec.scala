@@ -3,12 +3,15 @@ package odelay.testing
 import odelay.{Delay, Timer}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.funspec.AsyncFunSpec
+
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.util.control.NonFatal
 import java.util.concurrent.CancellationException
 import java.util.concurrent.atomic.AtomicInteger
 import odelay.js._
+
+import scala.util.Failure
 
 class TimerSpec extends AsyncFunSpec with BeforeAndAfterAll {
 
@@ -48,13 +51,23 @@ class TimerSpec extends AsyncFunSpec with BeforeAndAfterAll {
       }
     }
 
-    it("completion of delayed operations should result in a future success") {
+    it("successful completion of delayed operations should result in a future success") {
       val future = Delay(1.second)(true).future
       future
         .recover { case NonFatal(_) =>
           sys.error("this should never print")
         }
         .map(value => assert(value === true))
+    }
+
+    it("successful completion of delayed operations should result in a future success") {
+      case object CustomException extends Exception
+
+      val future = Delay(1.second)(throw CustomException).future
+      future.transformWith {
+        case Failure(exception) => assert(exception === CustomException)
+        case _ => fail("The delayed future was expected to fail")
+      }
     }
 
     it("should repeatedly execute an operation on a fixed delay") {
