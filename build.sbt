@@ -90,7 +90,7 @@ lazy val netty = (projectMatrix in file("odelay-netty"))
   .settings(
     name := "odelay-netty",
     description := "an odelay.Timer implementation backed by netty 4",
-    libraryDependencies += "io.netty" % "netty-common" % "4.1.105.Final"
+    libraryDependencies += "io.netty" % "netty-common" % "4.1.106.Final"
   )
   .jvmPlatform(
     scalaVersions = scala2 ++ scala3,
