@@ -60,7 +60,7 @@ class TimerSpec extends AsyncFunSpec with BeforeAndAfterAll {
         .map(value => assert(value === true))
     }
 
-    it("successful completion of delayed operations should result in a future success") {
+    it("successful completion of delayed operations should result in a future failure") {
       case object CustomException extends Exception
 
       val future = Delay(1.second)(throw CustomException).future
