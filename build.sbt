@@ -1,13 +1,12 @@
 import com.softwaremill.SbtSoftwareMillCommon.commonSmlBuildSettings
 import com.softwaremill.Publish.ossPublishSettings
 
-val scala2_11 = "2.11.12"
 val scala2_12 = "2.12.19"
 val scala2_13 = "2.13.14"
-val scala2 = List(scala2_11, scala2_12, scala2_13)
+val scala2 = List(scala2_12, scala2_13)
 val scala3 = List("3.4.1")
 
-val scalatestVersion = "3.2.18"
+val scalatestVersion = "3.2.19"
 
 excludeLintKeys in Global ++= Set(ideSkipProject)
 
@@ -90,7 +89,7 @@ lazy val netty = (projectMatrix in file("odelay-netty"))
   .settings(
     name := "odelay-netty",
     description := "an odelay.Timer implementation backed by netty 4",
-    libraryDependencies += "io.netty" % "netty-common" % "4.1.109.Final"
+    libraryDependencies += "io.netty" % "netty-common" % "4.1.112.Final"
   )
   .jvmPlatform(
     scalaVersions = scala2 ++ scala3,
@@ -102,16 +101,14 @@ lazy val twitter = (projectMatrix in file("odelay-twitter"))
   .settings(
     name := "odelay-twitter",
     libraryDependencies := (scalaVersion.value match {
-      case rewrite if rewrite.startsWith("2.11") =>
-        Seq("com.twitter" % "util-core_2.11" % "21.2.0")
       case rewrite if rewrite.startsWith("2.12") =>
-        Seq("com.twitter" %% "util-core" % "23.11.0")
+        Seq("com.twitter" %% "util-core" % "24.2.0")
       case _ => Nil
     }) ++ libraryDependencies.value,
     description := "an odelay.Timer implementation backed by a com.twitter.util.Timer"
   )
   .jvmPlatform(
-    scalaVersions = List(scala2_11, scala2_12),
+    scalaVersions = List(scala2_12),
     settings = commonJvmSettings
   )
   .dependsOn(core, testing % "test->test")

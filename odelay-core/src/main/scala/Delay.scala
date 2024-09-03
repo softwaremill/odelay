@@ -3,8 +3,7 @@ package odelay
 import scala.concurrent.{Future, Promise}
 import scala.concurrent.duration.{Duration, FiniteDuration}
 import java.util.concurrent.CancellationException
-
-import scala.util.control.NonFatal
+import scala.util.Try
 
 /** Provides an interface for producing Delays. Use requires an implicit [[odelay.Timer]] to be in implicit scope.
   * {{{
@@ -80,7 +79,7 @@ abstract class PromisingDelay[T] extends Delay[T] {
 
   /** Completes the Promise with a success if the promise is not already completed */
   protected def completePromise(value: => T): Unit =
-    if (promiseIncomplete) promise.success(value)
+    if (promiseIncomplete) promise.complete(Try(value))
 
   /** @return true if the promise is not completed */
   protected def promiseIncomplete =
