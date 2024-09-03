@@ -1,10 +1,9 @@
 import com.softwaremill.SbtSoftwareMillCommon.commonSmlBuildSettings
 import com.softwaremill.Publish.ossPublishSettings
 
-val scala2_11 = "2.11.12"
 val scala2_12 = "2.12.19"
 val scala2_13 = "2.13.12"
-val scala2 = List(scala2_11, scala2_12, scala2_13)
+val scala2 = List(scala2_12, scala2_13)
 val scala3 = List("3.4.1")
 
 val scalatestVersion = "3.2.18"
@@ -102,8 +101,6 @@ lazy val twitter = (projectMatrix in file("odelay-twitter"))
   .settings(
     name := "odelay-twitter",
     libraryDependencies := (scalaVersion.value match {
-      case rewrite if rewrite.startsWith("2.11") =>
-        Seq("com.twitter" % "util-core_2.11" % "21.2.0")
       case rewrite if rewrite.startsWith("2.12") =>
         Seq("com.twitter" %% "util-core" % "23.11.0")
       case _ => Nil
@@ -111,7 +108,7 @@ lazy val twitter = (projectMatrix in file("odelay-twitter"))
     description := "an odelay.Timer implementation backed by a com.twitter.util.Timer"
   )
   .jvmPlatform(
-    scalaVersions = List(scala2_11, scala2_12),
+    scalaVersions = List(scala2_12),
     settings = commonJvmSettings
   )
   .dependsOn(core, testing % "test->test")
