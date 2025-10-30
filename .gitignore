@@ -1,3 +1,7 @@
 target
 *~
 .idea
+.bsp
+.metals
+.vscode
+.cursor
