@@ -2,32 +2,33 @@ import com.softwaremill.SbtSoftwareMillCommon.commonSmlBuildSettings
 import com.softwaremill.Publish.ossPublishSettings
 
 val scala2_12 = "2.12.19"
-val scala2_13 = "2.13.14"
+val scala2_13 = "2.13.18"
 val scala2 = List(scala2_12, scala2_13)
 val scala3 = List("3.3.3")
 
 val scalatestVersion = "3.2.19"
 
-excludeLintKeys in Global ++= Set(ideSkipProject)
+Global / excludeLintKeys ++= Set(ideSkipProject)
 
-val commonSettings = commonSmlBuildSettings ++ ossPublishSettings ++ Seq(
-  organization := "com.softwaremill.odelay",
-  licenses := Seq(("MIT", url(s"https://github.com/softprops/odelay/blob/${version.value}/LICENSE")))
-)
+commonSmlBuildSettings
+ossPublishSettings
 
-val commonJvmSettings = commonSettings ++ Seq(
+organization := "com.softwaremill.odelay"
+licenses := Seq(License("MIT", url(s"https://github.com/softprops/odelay/blob/${version.value}/LICENSE")))
+
+val commonJvmSettings = Seq(
+  scalacOptions ++= (if (ScalaArtifacts.isScala3(scalaVersion.value)) Seq.empty else Seq("-release", "8")),
   ideSkipProject := (scalaVersion.value != scala2_13)
 )
 
-val commonJsSettings = commonSettings ++ Seq(
+val commonJsSettings = Seq(
   ideSkipProject := true
 )
 
 lazy val rootProject = (project in file("."))
-  .settings(commonSettings: _*)
   .settings(publish / skip := true, name := "odelay", scalaVersion := scala2_13)
   .aggregate(
-    core.projectRefs ++ testing.projectRefs ++ coreTests.projectRefs ++ netty3.projectRefs ++ netty.projectRefs ++ twitter.projectRefs: _*
+    core.projectRefs ++ testing.projectRefs ++ coreTests.projectRefs ++ netty3.projectRefs ++ netty.projectRefs ++ twitter.projectRefs*
   )
 
 lazy val core = (projectMatrix in file("odelay-core"))
@@ -47,7 +48,7 @@ lazy val core = (projectMatrix in file("odelay-core"))
 lazy val testing = (projectMatrix in file("odelay-testing"))
   .settings(
     name := "odelay-testing",
-    libraryDependencies += "org.scalatest" %%% "scalatest" % scalatestVersion % Test,
+    libraryDependencies += "org.scalatest" %% "scalatest" % scalatestVersion % Test,
     publish / skip := true
   )
   .jvmPlatform(
@@ -57,7 +58,7 @@ lazy val testing = (projectMatrix in file("odelay-testing"))
   .jsPlatform(
     scalaVersions = scala2 ++ scala3,
     settings = commonJsSettings ++ Seq(
-      libraryDependencies += "io.github.cquiroz" %%% "scala-java-time" % "2.4.0"
+      libraryDependencies += "io.github.cquiroz" %% "scala-java-time" % "2.4.0"
     )
   )
   .dependsOn(core)
