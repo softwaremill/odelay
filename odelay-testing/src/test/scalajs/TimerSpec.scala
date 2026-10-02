@@ -66,7 +66,7 @@ class TimerSpec extends AsyncFunSpec with BeforeAndAfterAll {
       val future = Delay(1.second)(throw CustomException).future
       future.transformWith {
         case Failure(exception) => assert(exception === CustomException)
-        case _ => fail("The delayed future was expected to fail")
+        case _                  => fail("The delayed future was expected to fail")
       }
     }
 
