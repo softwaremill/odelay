@@ -58,7 +58,7 @@ lazy val testing = (projectMatrix in file("odelay-testing"))
   .jsPlatform(
     scalaVersions = scala2 ++ scala3,
     settings = commonJsSettings ++ Seq(
-      libraryDependencies += "io.github.cquiroz" %% "scala-java-time" % "2.4.0"
+      libraryDependencies += "io.github.cquiroz" %% "scala-java-time" % "2.7.0"
     )
   )
   .dependsOn(core)
