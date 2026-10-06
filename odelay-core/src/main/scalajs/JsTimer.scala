@@ -31,6 +31,7 @@ class JsTimer() extends Timer {
       }
 
       def cancel(): Unit = {
+        clearTimeout(initclearable)
         if (clearable != null) clearInterval(clearable)
         cancelPromise()
       }

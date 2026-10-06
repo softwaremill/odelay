@@ -46,7 +46,7 @@ class TimerSpec extends AsyncFunSpec with BeforeAndAfterAll {
         cancel.cancel()
       }
       cancel.future.recover {
-        case x: CancellationException => succeed
+        case _: CancellationException => succeed
         case _                        => fail()
       }
     }
@@ -63,7 +63,7 @@ class TimerSpec extends AsyncFunSpec with BeforeAndAfterAll {
     it("successful completion of delayed operations should result in a future failure") {
       case object CustomException extends Exception
 
-      val future = Delay(1.second)(throw CustomException).future
+      val future = Delay[Unit](1.second)(throw CustomException).future
       future.transformWith {
         case Failure(exception) => assert(exception === CustomException)
         case _ => fail("The delayed future was expected to fail")

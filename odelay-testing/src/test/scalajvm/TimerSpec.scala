@@ -39,7 +39,7 @@ trait TimerSpec extends AsyncFunSpec with BeforeAndAfterAll {
         cancel.cancel()
       }
       for {
-        cf <- cancelF.future
+        _ <- cancelF.future
         c <- cancel.future.failed
       } yield {
         assert(c.getClass === classOf[CancellationException])
@@ -54,7 +54,7 @@ trait TimerSpec extends AsyncFunSpec with BeforeAndAfterAll {
     it("unsuccessful completion of delayed operations should result in a future failure") {
       case object CustomException extends Exception
 
-      val future = Delay(1.second)(throw CustomException).future
+      val future = Delay[Unit](1.second)(throw CustomException).future
       future.transformWith {
         case Failure(exception) => assert(exception === CustomException)
         case _                  => fail("The delayed future was expected to fail")
@@ -78,7 +78,7 @@ trait TimerSpec extends AsyncFunSpec with BeforeAndAfterAll {
       val counter = new AtomicInteger(0)
       val cancel = Delay.every(150.seconds)()(true)
       val cancelFut = cancel.future.recoverWith {
-        case e: CancellationException =>
+        case _: CancellationException =>
           counter.incrementAndGet()
           Future.successful(true)
         case _ => Future.successful(true)
