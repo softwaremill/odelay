@@ -1,6 +1,7 @@
 package odelay.jdk
 
 import java.util.concurrent.{
+  Future => JFuture,
   RejectedExecutionHandler,
   ScheduledExecutorService,
   ScheduledThreadPoolExecutor,
@@ -31,7 +32,7 @@ class JdkTimer(underlying: ScheduledExecutorService, interruptOnCancel: Boolean)
 
   def apply[T](delay: FiniteDuration, op: => T): Delay[T] =
     new PromisingDelay[T] {
-      val jfuture =
+      val jfuture: Option[JFuture[?]] =
         try {
           Some(
             underlying.schedule(
@@ -56,7 +57,7 @@ class JdkTimer(underlying: ScheduledExecutorService, interruptOnCancel: Boolean)
 
   def apply[T](delay: FiniteDuration, every: FiniteDuration, op: => T): PeriodicDelay[T] =
     new PeriodicPromisingDelay[T](every) {
-      val jfuture =
+      val jfuture: Option[JFuture[?]] =
         try {
           Some(
             underlying.scheduleWithFixedDelay(

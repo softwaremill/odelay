@@ -17,7 +17,8 @@ organization := "com.softwaremill.odelay"
 licenses := Seq(License("MIT", url(s"https://github.com/softprops/odelay/blob/${version.value}/LICENSE")))
 
 val commonJvmSettings = Seq(
-  scalacOptions ++= (if (ScalaArtifacts.isScala3(scalaVersion.value)) Seq.empty else Seq("-release", "8")),
+  scalacOptions ++= (if (ScalaArtifacts.isScala3(scalaVersion.value)) Seq.empty
+                     else Seq("-release", "8", "-Xsource:3")),
   ideSkipProject := (scalaVersion.value != scala2_13)
 )
 
