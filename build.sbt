@@ -4,7 +4,7 @@ import com.softwaremill.Publish.ossPublishSettings
 val scala2_12 = "2.12.19"
 val scala2_13 = "2.13.18"
 val scala2 = List(scala2_12, scala2_13)
-val scala3 = List("3.3.3")
+val scala3 = List("3.9.0")
 
 val scalatestVersion = "3.2.19"
 
@@ -17,7 +17,8 @@ organization := "com.softwaremill.odelay"
 licenses := Seq(License("MIT", url(s"https://github.com/softprops/odelay/blob/${version.value}/LICENSE")))
 
 val commonJvmSettings = Seq(
-  scalacOptions ++= (if (ScalaArtifacts.isScala3(scalaVersion.value)) Seq.empty else Seq("-release", "8")),
+  scalacOptions ++= (if (ScalaArtifacts.isScala3(scalaVersion.value)) Seq.empty
+                     else Seq("-release", "8", "-Xsource:3")),
   ideSkipProject := (scalaVersion.value != scala2_13)
 )
 

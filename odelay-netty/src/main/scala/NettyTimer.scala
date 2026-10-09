@@ -13,7 +13,7 @@ class NettyGroupTimer(grp: EventExecutorGroup, interruptOnCancel: Boolean = Nett
 
   def apply[T](delay: FiniteDuration, op: => T): Delay[T] =
     new PromisingDelay[T] {
-      val sf: Option[NFuture[_]] =
+      val sf: Option[NFuture[?]] =
         try {
           Some(
             grp.schedule(
@@ -38,7 +38,7 @@ class NettyGroupTimer(grp: EventExecutorGroup, interruptOnCancel: Boolean = Nett
 
   def apply[T](delay: FiniteDuration, every: FiniteDuration, op: => T): PeriodicDelay[T] =
     new PeriodicPromisingDelay[T](every) {
-      val sf: Option[NFuture[_]] =
+      val sf: Option[NFuture[?]] =
         try {
           Some(
             grp.scheduleWithFixedDelay(
