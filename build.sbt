@@ -6,7 +6,7 @@ val scala2_13 = "2.13.18"
 val scala2 = List(scala2_12, scala2_13)
 val scala3 = List("3.9.0")
 
-val scalatestVersion = "3.2.19"
+val scalatestVersion = "3.2.20"
 
 Global / excludeLintKeys ++= Set(ideSkipProject)
 
